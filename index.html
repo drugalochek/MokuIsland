@@ -116,7 +116,7 @@
     .buddy-face{width:112px;height:76px;display:block;padding:0;border:0;background:transparent;pointer-events:auto;cursor:pointer;touch-action:manipulation}
     .buddy-face canvas{display:block;width:112px;height:76px;overflow:visible}
     .buddy-face:focus-visible{outline:1px solid #777;outline-offset:5px;border-radius:12px}
-    @media(max-width:600px){.moku-buddy{gap:7px}.buddy-face,.buddy-face canvas{width:92px;height:66px}.buddy-bubble{max-width:min(205px,58vw);font-size:11px;padding:9px 11px}}
+    @media(max-width:600px){.moku-buddy{gap:7px;max-width:calc(100vw - 16px)}.buddy-face{width:min(92px,28vw);height:auto;aspect-ratio:336/228;flex:0 0 auto}.buddy-face canvas{width:100%;height:100%;overflow:hidden}.buddy-bubble{max-width:min(205px,calc(100vw - 116px));font-size:11px;padding:9px 11px}}
     @media(prefers-reduced-motion:reduce){.buddy-bubble{transition:none}}
     /* Pure black base with a very subtle white fade at the top */
     :root{--bg:#000!important}
@@ -338,12 +338,12 @@
       function chooseFlightTarget(x,y){
         const size=flightBounds(),right=innerWidth-size.w;
         // The mascot stays docked to the right edge; only its height changes freely.
-        flight.tx=clamp(x,right-10,right+6);
+        flight.tx=clamp(x,8,Math.max(8,right-12));
         flight.ty=clamp(y,18,Math.max(18,innerHeight-size.h-18));
       }
       function initFlight(){
         const size=flightBounds();
-        flight.x=Math.max(8,innerWidth-size.w-2);
+        flight.x=clamp(innerWidth-size.w-12,8,Math.max(8,innerWidth-size.w-12));
         flight.y=clamp(innerHeight*.68,18,innerHeight-size.h-18);
         flight.tx=flight.x;flight.ty=flight.y;
         buddy.style.setProperty('--flight-x',flight.x+'px');
@@ -375,7 +375,7 @@
       initFlight();
       window.addEventListener('resize',()=>{
         const size=flightBounds();
-        chooseFlightTarget(innerWidth-size.w-2,clamp(flight.y,12,innerHeight-size.h-12));
+        chooseFlightTarget(innerWidth-size.w-12,clamp(flight.y,12,innerHeight-size.h-12));
       },{passive:true});
 
       const sectionTalk={
