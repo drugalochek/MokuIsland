@@ -4,72 +4,122 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#080808">
-  <meta name="description" content="MokuIsland — приложение.">
-  <title>MokuIsland</title>
+  <meta name="description" content="Moku — живой Dynamic Island для Windows 10 и 11. Музыка, погода, скриншоты, буфер обмена и быстрые инструменты.">
+  <title>MokuIsland — Dynamic Island для Windows</title>
   <style>
-    :root{color-scheme:dark;--bg:#080808;--panel:rgba(255,255,255,.045);--line:rgba(255,255,255,.11);--muted:#858585;--white:#f4f4f4}
+    :root{color-scheme:dark;--bg:#080808;--panel:rgba(255,255,255,.045);--line:rgba(255,255,255,.12);--muted:#929292;--white:#f4f4f4}
     *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -25%,rgba(255,255,255,.09),transparent 48%),var(--bg);color:var(--white);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.025em}
+    html{scroll-behavior:smooth;scroll-padding-top:90px}
+    body{margin:0;background:radial-gradient(ellipse at 50% -25%,rgba(255,255,255,.085),transparent 48%),var(--bg);color:var(--white);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.025em}
     a{color:inherit;text-decoration:none}
-    .wrap{width:min(1100px,calc(100% - 40px));margin:auto}
-    header{height:78px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.07)}
-    .brand{font-size:19px;font-weight:700;letter-spacing:-.06em}
+    .wrap{width:min(1120px,calc(100% - 40px));margin:auto}
+    header{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.075)}
+    .brand{font-size:19px;font-weight:720;letter-spacing:-.065em}
+    .brand span{color:#777}
     .nav{display:flex;gap:28px;color:#aaa;font-size:13px}
     .nav a:hover{color:#fff}
-    .status{display:flex;align-items:center;gap:8px;color:#999;font-size:12px}
-    .dot{width:6px;height:6px;border-radius:50%;background:#aaa;box-shadow:0 0 12px #aaa}
-    main{padding:110px 0 90px;text-align:center}
+    .version{padding:7px 10px;border:1px solid var(--line);border-radius:999px;color:#aaa;font-size:11px}
+    main{padding:105px 0 75px;text-align:center}
     .eyebrow{display:inline-flex;align-items:center;gap:9px;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.035);color:#aaa;font-size:11px;letter-spacing:.12em;text-transform:uppercase;backdrop-filter:blur(18px)}
-    h1{margin:27px 0 18px;font-size:clamp(64px,12vw,124px);line-height:.92;letter-spacing:-.095em;font-weight:650}
-    .lead{max-width:510px;margin:0 auto;color:#999;font-size:clamp(15px,2vw,18px);line-height:1.7;letter-spacing:-.02em}
-    .actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:34px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 20px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.055);font-size:13px;font-weight:600;transition:.2s;backdrop-filter:blur(18px)}
+    .dot{width:6px;height:6px;border-radius:50%;background:#aaa;box-shadow:0 0 12px #aaa}
+    h1{margin:27px 0 18px;font-size:clamp(62px,11vw,112px);line-height:.94;letter-spacing:-.095em;font-weight:650}
+    .lead{max-width:590px;margin:0 auto;color:#999;font-size:clamp(15px,2vw,18px);line-height:1.75}
+    .actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:32px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 20px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.055);font-size:13px;font-weight:620;transition:.2s;backdrop-filter:blur(18px)}
     .btn.primary{background:#f2f2f2;color:#090909;border-color:#f2f2f2}
-    .btn:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.3)}
-    .note{margin-top:15px;color:#666;font-size:11px}
-    .preview{position:relative;margin:78px auto 0;max-width:850px;padding:10px;border:1px solid rgba(255,255,255,.13);border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.015));box-shadow:0 35px 100px rgba(0,0,0,.55);backdrop-filter:blur(24px)}
-    .window{min-height:300px;border:1px solid rgba(255,255,255,.07);border-radius:14px;background:#0d0d0d;display:grid;place-items:center;overflow:hidden}
-    .mark{width:76px;height:76px;border:1px solid rgba(255,255,255,.2);border-radius:23px;display:grid;place-items:center;font-size:34px;font-weight:650;letter-spacing:-.1em;color:#eee;background:linear-gradient(145deg,rgba(255,255,255,.1),rgba(255,255,255,.015));box-shadow:0 15px 45px #000}
-    .preview-label{margin-top:16px;color:#666;font-size:10px;letter-spacing:.18em;text-transform:uppercase}
-    section{padding:54px 0 76px}
-    .section-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:20px}
-    h2{margin:0;font-size:25px;letter-spacing:-.06em}
+    .btn:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.32)}
+    .note{margin-top:14px;color:#666;font-size:11px}
+    .hero-shot{max-width:900px;margin:68px auto 0;padding:9px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.012));box-shadow:0 35px 100px rgba(0,0,0,.48);backdrop-filter:blur(24px)}
+    .hero-shot img{display:block;width:100%;height:auto;border-radius:12px}
+    section{padding:55px 0 70px}
+    .section-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:22px}
+    h2{margin:0;font-size:27px;letter-spacing:-.065em}
     .section-head p{margin:0;color:#777;font-size:12px}
-    .card{padding:26px;border:1px solid var(--line);border-radius:18px;background:var(--panel);backdrop-filter:blur(20px)}
-    .card p{margin:0;color:#999;font-size:14px;line-height:1.75}
-    footer{border-top:1px solid rgba(255,255,255,.07);padding:25px 0 35px;color:#666;font-size:11px;display:flex;justify-content:space-between;gap:16px}
-    @media(max-width:600px){header{height:66px}.nav{gap:15px}main{padding:82px 0 55px}.preview{margin-top:55px}.window{min-height:220px}.section-head{display:block}.section-head p{margin-top:8px}footer{display:block}footer span{display:block;margin-top:8px}}
+    .gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+    .shot{overflow:hidden;border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:9px;backdrop-filter:blur(20px)}
+    .shot img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:contain;background:#0b0b0b;border-radius:10px}
+    .shot figcaption{padding:12px 7px 5px;color:#aaa;font-size:12px}
+    .shot figcaption strong{color:#eee;font-weight:600}
+    .features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .feature{padding:21px;border:1px solid var(--line);border-radius:15px;background:var(--panel)}
+    .feature h3{margin:0 0 9px;font-size:14px;letter-spacing:-.035em}
+    .feature p{margin:0;color:#929292;font-size:12px;line-height:1.7}
+    .download-card{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:27px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(130deg,rgba(255,255,255,.07),rgba(255,255,255,.02))}
+    .download-card h2{margin-bottom:8px}
+    .download-card p{margin:0;color:#929292;font-size:12px;line-height:1.6}
+    footer{border-top:1px solid rgba(255,255,255,.075);padding:25px 0 34px;color:#666;font-size:11px;display:flex;justify-content:space-between;gap:16px}
+    @media(max-width:760px){.features{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:600px){header{height:66px}.nav{gap:14px;font-size:12px}.version{display:none}main{padding:78px 0 48px}.hero-shot{margin-top:48px}.section-head{display:block}.section-head p{margin-top:8px}.gallery{grid-template-columns:1fr}.features{grid-template-columns:1fr}.download-card{display:block}.download-card .btn{margin-top:18px}footer{display:block}footer span{display:block;margin-top:8px}}
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <a class="brand" href="#">moku.island<span style="color:#777">.</span></a>
+      <a class="brand" href="#">moku<span>.</span></a>
       <nav class="nav" aria-label="Навигация">
-        <a href="#about">О проекте</a>
-        <a href="#download">Загрузка</a>
+        <a href="#screenshots">Скриншоты</a>
+        <a href="#features">Возможности</a>
+        <a href="#download">Скачать</a>
       </nav>
-      <div class="status"><span class="dot"></span> Official page</div>
+      <span class="version">Windows 10 / 11 · v2.12.3</span>
     </header>
+
     <main>
-      <div class="eyebrow"> <span class="dot"></span> MokuIsland</div>
+      <div class="eyebrow"><span class="dot"></span> MokuIsland · Windows app</div>
       <h1>Less noise.<br>More focus.</h1>
-      <p class="lead">MokuIsland. Минималистичный интерфейс без лишнего шума. Всё внимание — на главном.</p>
+      <p class="lead">Moku — живой Dynamic Island для Windows. Музыка, погода, быстрые инструменты и нужная информация в компактном интерактивном острове.</p>
       <div class="actions" id="download">
-        <a class="btn primary" href="https://drive.google.com/uc?export=download&amp;id=1Pr7mm5UboEKnZ4JQo6ATShQzJ1zE6WVa" target="_blank" rel="noopener">Скачать MokuIsland <span aria-hidden="true" style="margin-left:10px">↗</span></a>
-        <a class="btn" href="#about">Подробнее</a>
+        <a class="btn primary" href="https://github.com/drugalochek/Moku/releases/download/Release/Moku-Setup-2.12.3-x64.exe">Скачать Moku 2.12.3 <span aria-hidden="true" style="margin-left:10px">↓</span></a>
+        <a class="btn" href="https://github.com/drugalochek/Moku/releases">Все релизы ↗</a>
       </div>
-      <div class="note">Ссылка ведёт на файл в Google Drive.</div>
-      <div class="preview" aria-label="Визуальная карточка MokuIsland">
-        <div class="window"><div><div class="mark">m</div><div class="preview-label">MokuIsland interface</div></div></div>
-      </div>
+      <div class="note">Установщик для Windows 10 / 11 · x64 · около 144 МБ</div>
+      <figure class="hero-shot">
+        <img src="https://raw.githubusercontent.com/drugalochek/Moku/main/Screenshots/Moku-screenshot-3.png" alt="Главная вкладка Moku с музыкой, буфером обмена и быстрыми инструментами" fetchpriority="high">
+      </figure>
     </main>
-    <section id="about">
-      <div class="section-head"><h2>О MokuIsland</h2><p>Простота — это не отсутствие деталей.</p></div>
-      <div class="card"><p>MokuIsland — приложение с лаконичным визуальным стилем. Эта страница — официальный вход в проект и место для загрузки. Подробности и возможности приложения будут добавлены по мере подготовки материалов.</p></div>
+
+    <section id="screenshots">
+      <div class="section-head"><h2>Скриншоты</h2><p>Реальный интерфейс Moku</p></div>
+      <div class="gallery">
+        <figure class="shot">
+          <img src="https://raw.githubusercontent.com/drugalochek/Moku/main/Screenshots/Moku-screenshot-1.png" alt="Moku во время воспроизведения музыки" loading="lazy">
+          <figcaption><strong>Музыка</strong> · обложка, управление и живая волна</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="https://raw.githubusercontent.com/drugalochek/Moku/main/Screenshots/Moku-screenshot-2.png" alt="Свёрнутый Moku с часами и погодой" loading="lazy">
+          <figcaption><strong>Свёрнутый вид</strong> · время, погода и живые глазки</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="https://raw.githubusercontent.com/drugalochek/Moku/main/Screenshots/Moku-screenshot-4.png" alt="Настройки Moku по разделам" loading="lazy">
+          <figcaption><strong>Настройки</strong> · категории, поиск и настройка внешнего вида</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="https://raw.githubusercontent.com/drugalochek/Moku/main/Screenshots/Moku-screenshot-5.png" alt="Вкладка приложений Moku" loading="lazy">
+          <figcaption><strong>Приложения</strong> · игры Steam и быстрый запуск программ</figcaption>
+        </figure>
+      </div>
     </section>
-    <footer><strong style="color:#aaa">moku.island.</strong><span>© <span id="year"></span> MokuIsland. All rights reserved.</span></footer>
+
+    <section id="features">
+      <div class="section-head"><h2>Что умеет Moku</h2><p>Инструменты, которые всегда под рукой</p></div>
+      <div class="features">
+        <article class="feature"><h3>Музыка</h3><p>Название трека, обложка альбома и управление воспроизведением. Анимация острова реагирует на музыку.</p></article>
+        <article class="feature"><h3>Время и погода</h3><p>Часы, дата, погода, батарея, загрузка CPU или RAM в свёрнутом виде.</p></article>
+        <article class="feature"><h3>Скриншоты</h3><p>Захват области или всего экрана, разметка пером, стрелками, рамками и маркером.</p></article>
+        <article class="feature"><h3>Буфер обмена</h3><p>История скопированного с настройкой количества записей и быстрым доступом.</p></article>
+        <article class="feature"><h3>Приложения и Steam</h3><p>Быстрый запуск программ, файлов, папок и игр Steam из одного места.</p></article>
+        <article class="feature"><h3>Настройка под себя</h3><p>Формы глаз, цвета, размеры, анимации, положение острова и горячая клавиша.</p></article>
+      </div>
+    </section>
+
+    <section>
+      <div class="download-card">
+        <div><h2>Попробуй Moku</h2><p>Windows 10 / 11, 64-bit · Версия 2.12.3 · .NET 8</p></div>
+        <a class="btn primary" href="https://github.com/drugalochek/Moku/releases/download/Release/Moku-Setup-2.12.3-x64.exe">Скачать установщик ↓</a>
+      </div>
+    </section>
+
+    <footer><strong style="color:#aaa">moku.island.</strong><span>© <span id="year"></span> Moku · <a href="https://github.com/drugalochek/Moku">GitHub</a></span></footer>
   </div>
   <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
 </body>
