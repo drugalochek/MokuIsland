@@ -14,7 +14,7 @@
     a{color:inherit;text-decoration:none}
     .wrap{width:min(1120px,calc(100% - 40px));margin:auto}
     header{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.075)}
-    .brand{font-size:19px;font-weight:720;letter-spacing:-.065em}
+    .brand{font-size:21px;font-weight:720;letter-spacing:-.065em}
     .brand span{color:#777}
     .nav{display:flex;gap:28px;color:#aaa;font-size:13px}
     .nav a:hover{color:#fff}
@@ -30,7 +30,7 @@
     .btn:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.32)}
     .note{margin-top:14px;color:#666;font-size:11px}
     .hero-shot{max-width:900px;margin:68px auto 0;padding:9px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.012));box-shadow:0 35px 100px rgba(0,0,0,.48);backdrop-filter:blur(24px)}
-    .hero-shot img{display:block;width:100%;height:auto;border-radius:12px}
+    .hero-shot img{display:block;width:100%;height:auto;border-radius:12px;cursor:zoom-in}
     section{padding:55px 0 70px}
     .section-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:22px}
     h2{margin:0;font-size:27px;letter-spacing:-.065em}
@@ -67,7 +67,7 @@
 <body>
   <div class="wrap">
     <header>
-      <a class="brand" href="#" style="display:flex;align-items:center;gap:9px"><img src="https://raw.githubusercontent.com/drugalochek/MokuIsland/main/Picsart_26-11-12_03-28-01-581.png" alt="" width="28" height="28" style="width:28px;height:28px;object-fit:contain;border-radius:8px">moku<span>.</span></a>
+      <a class="brand" href="#" style="display:flex;align-items:center;gap:9px"><img src="https://raw.githubusercontent.com/drugalochek/MokuIsland/main/Picsart_26-11-12_03-28-01-581.png" alt="" width="42" height="42" style="width:42px;height:42px;object-fit:contain;border-radius:11px">moku<span>.</span></a>
       <nav class="nav" aria-label="Навигация">
         <a href="#screenshots">Скриншоты</a>
         <a href="#features">Возможности</a>
@@ -169,13 +169,19 @@
         if (previousFocus && typeof previousFocus.focus === 'function') previousFocus.focus();
       }
       shots.forEach(img => {
-        img.addEventListener('click', () => openImage(img));
         img.setAttribute('tabindex', '0');
         img.setAttribute('role', 'button');
         img.setAttribute('aria-label', 'Открыть изображение во весь экран');
-        img.addEventListener('keydown', event => {
-          if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openImage(img); }
-        });
+      });
+      document.addEventListener('click', event => {
+        const img = event.target.closest('.shot img, .hero-shot img');
+        if (img) openImage(img);
+      });
+      document.addEventListener('keydown', event => {
+        if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('.shot img, .hero-shot img')) {
+          event.preventDefault();
+          openImage(event.target);
+        }
       });
       closeButton.addEventListener('click', closeImage);
       overlay.addEventListener('click', event => { if (event.target === overlay) closeImage(); });
