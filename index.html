@@ -275,7 +275,7 @@
           r.sx.step(dt,shapeK*r.stiff,shapeZ);r.sy.step(dt,shapeK*r.stiff,shapeZ);
           r.rot.step(dt,200*r.stiff,.5);stepLid(r,dt);centers.push(drawEye(r));
         });
-        petLevel=Math.max(0,petLevel-dt*.6);blush+=(mood==='blissful'?.9:0-blush)*(1-Math.exp(-4*dt));
+        petLevel=Math.max(0,petLevel-dt*.6);blush+=((mood==='blissful'?.9:0)-blush)*(1-Math.exp(-4*dt));
         if(blush>.01){ctx.globalAlpha=blush*.32;ctx.fillStyle='#ff7da8';centers.forEach(p=>{ctx.beginPath();ctx.ellipse(p.x+(p.x<168?-11:11),p.y+20,10,4,0,0,Math.PI*2);ctx.fill()});ctx.globalAlpha=1}
         if(reduced)return;
         if(mood==='neutral'&&Math.random()<dt*.001)blinkBoth();
