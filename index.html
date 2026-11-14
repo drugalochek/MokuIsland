@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#080808">
+  <meta name="theme-color" content="#000000">
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/drugalochek/MokuIsland/main/Picsart_26-11-12_03-28-01-581.png">
   <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/drugalochek/MokuIsland/main/Picsart_26-11-12_03-28-01-581.png">
   <meta name="description" content="Moku — живой Dynamic Island для Windows 10 и 11. Музыка, погода, скриншоты, буфер обмена и быстрые инструменты.">
@@ -118,10 +118,10 @@
     .buddy-face:focus-visible{outline:1px solid #777;outline-offset:5px;border-radius:12px}
     @media(max-width:600px){.moku-buddy{gap:7px}.buddy-face,.buddy-face canvas{width:92px;height:66px}.buddy-bubble{max-width:min(205px,58vw);font-size:11px;padding:9px 11px}}
     @media(prefers-reduced-motion:reduce){.buddy-bubble{transition:none}}
-    /* True black, with framed individual screenshots */
+    /* Pure black base with a very subtle white fade at the top */
     :root{--bg:#000!important}
-    html,body{background:#000!important}
-    body{background:#000!important}
+    html{background:#000!important}
+    body{background:radial-gradient(ellipse at 50% -28%,rgba(255,255,255,.055),transparent 46%),#000!important}
     .shot{padding:11px!important;border:1px solid #292929!important;border-radius:12px!important;background:#050505!important;transition:border-color .2s,transform .2s}
     .shot:hover{border-color:#555!important;transform:translateY(-2px)!important}
     .shot img{background:#000!important;border-radius:6px!important}
