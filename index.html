@@ -66,13 +66,13 @@
     @media(max-width:600px){header{height:76px}.nav{gap:14px;font-size:12px}.version{display:none}main{padding:78px 0 48px}.hero-shot{margin-top:48px}.section-head{display:block}.section-head p{margin-top:8px}.gallery{grid-template-columns:1fr}.features{grid-template-columns:1fr}.download-card{display:block}.download-card .btn{margin-top:18px}footer{display:block}footer span{display:block;margin-top:8px}}
   
     /* Moku eyes: Canvas port of Vvg's spring-driven eye rig */
-    .moku-buddy{position:fixed;right:28px;bottom:24px;z-index:80;display:flex;align-items:flex-end;gap:10px;pointer-events:none}
+    .moku-buddy{position:fixed;left:0;top:0;right:auto;bottom:auto;z-index:80;display:flex;align-items:flex-end;gap:10px;pointer-events:none;will-change:transform;transform:translate3d(var(--flight-x,0px),var(--flight-y,0px),0)}
     .buddy-bubble{max-width:245px;padding:11px 14px;border:1px solid rgba(255,255,255,.14);border-radius:14px 14px 4px 14px;background:rgba(17,17,17,.88);color:#e9e9e9;font-size:12px;line-height:1.55;box-shadow:0 12px 42px rgba(0,0,0,.4);backdrop-filter:blur(20px);opacity:0;transform:translateY(7px) scale(.97);transition:opacity .22s,transform .22s}
     .moku-buddy.talking .buddy-bubble{opacity:1;transform:translateY(0) scale(1)}
     .buddy-face{width:112px;height:76px;display:block;padding:0;border:0;background:transparent;pointer-events:auto;cursor:pointer;touch-action:manipulation}
     .buddy-face canvas{display:block;width:112px;height:76px;overflow:visible}
     .buddy-face:focus-visible{outline:1px solid #777;outline-offset:5px;border-radius:12px}
-    @media(max-width:600px){.moku-buddy{right:13px;bottom:13px;gap:7px}.buddy-face,.buddy-face canvas{width:92px;height:66px}.buddy-bubble{max-width:min(205px,58vw);font-size:11px;padding:9px 11px}}
+    @media(max-width:600px){.moku-buddy{gap:7px}.buddy-face,.buddy-face canvas{width:92px;height:66px}.buddy-bubble{max-width:min(205px,58vw);font-size:11px;padding:9px 11px}}
     @media(prefers-reduced-motion:reduce){.buddy-bubble{transition:none}}
 
   </style>
@@ -247,6 +247,7 @@
       function frame(now){
         const dt=Math.min(.034,Math.max(.001,(now-last)/1000));last=now;time+=dt;
         if(mood!=='neutral'&&time>moodUntil)pop('neutral');
+        stepFlight(dt);
         const idle=(now-lastMove)/1000;
         const rect=face.getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
         const dx=pointerX-cx,dy=pointerY-cy,dist=Math.hypot(dx,dy);
@@ -281,6 +282,84 @@
         if(mood==='neutral'&&Math.random()<dt*.001)blinkBoth();
         requestAnimationFrame(frame);
       }
+
+      // Whole-mascot flight: a damped spring steers the buddy around the viewport.
+      const flight={x:0,y:0,vx:0,vy:0,tx:0,ty:0,next:0};
+      function flightBounds(){
+        const r=buddy.getBoundingClientRect();
+        return {w:r.width||190,h:r.height||90};
+      }
+      function chooseFlightTarget(x,y){
+        const size=flightBounds(),pad=16;
+        flight.tx=clamp(x,pad,Math.max(pad,innerWidth-size.w-pad));
+        flight.ty=clamp(y,pad,Math.max(pad,innerHeight-size.h-pad));
+      }
+      function initFlight(){
+        const size=flightBounds();
+        flight.x=Math.max(16,innerWidth-size.w-24);
+        flight.y=Math.max(16,innerHeight-size.h-28);
+        flight.tx=flight.x;flight.ty=flight.y;
+        buddy.style.setProperty('--flight-x',flight.x+'px');
+        buddy.style.setProperty('--flight-y',flight.y+'px');
+        flight.next=time+1.8;
+      }
+      function stepFlight(dt){
+        if(reduced)return;
+        if(time>=flight.next){
+          const size=flightBounds();
+          chooseFlightTarget(rand(24,Math.max(25,innerWidth-size.w-24)),rand(24,Math.max(25,innerHeight-size.h-24)));
+          flight.next=time+rand(3.2,5.8);
+        }
+        // A nearby pointer attracts the mascot gently; it never blocks page controls.
+        const size=flightBounds(),fx=flight.x+size.w*.72,fy=flight.y+size.h*.55;
+        const pd=Math.hypot(pointerX-fx,pointerY-fy);
+        if(pd<175){
+          const angle=Math.atan2(pointerY-fy,pointerX-fx);
+          chooseFlightTarget(flight.x+Math.cos(angle)*rand(35,85),flight.y+Math.sin(angle)*rand(28,65));
+          flight.next=Math.max(flight.next,time+.9);
+        }
+        const k=2.1,d=2*Math.sqrt(k)*.92;
+        flight.vx+=((flight.tx-flight.x)*k-flight.vx*d)*dt;
+        flight.vy+=((flight.ty-flight.y)*k-flight.vy*d)*dt;
+        flight.x+=flight.vx*dt;flight.y+=flight.vy*dt;
+        const bob=Math.sin(time*1.7)*3;
+        buddy.style.setProperty('--flight-x',flight.x+'px');
+        buddy.style.setProperty('--flight-y',(flight.y+bob)+'px');
+      }
+      initFlight();
+      window.addEventListener('resize',()=>{
+        const size=flightBounds();
+        chooseFlightTarget(clamp(flight.x,12,innerWidth-size.w-12),clamp(flight.y,12,innerHeight-size.h-12));
+      },{passive:true});
+
+      const sectionTalk={
+        hero:['Это главная MokuIsland. Здесь коротко о приложении и ссылка на установщик.','curious'],
+        screenshots:['Это скриншоты Moku. Нажми на любой, чтобы открыть его крупнее.','happy'],
+        features:['Здесь перечислены возможности Moku: музыка, погода, скриншоты и быстрые инструменты.','curious'],
+        download:['Это загрузка Moku. Установщик рассчитан на Windows 10 и 11, x64.','happy']
+      };
+      let lastSection='',sectionTimer;
+      function updateSection(){
+        const sections=[...document.querySelectorAll('main, #screenshots, #features, #download')];
+        const marker=innerHeight*.48;
+        let current=sections[0];
+        for(const el of sections){const r=el.getBoundingClientRect();if(r.top<=marker)current=el}
+        const key=current.id||'hero';
+        if(key===lastSection)return;
+        lastSection=key;
+        const rect=current.getBoundingClientRect(),size=flightBounds();
+        const targetY=clamp(rect.top+Math.min(rect.height*.38,180)-size.h*.45,20,innerHeight-size.h-20);
+        const targetX=clamp(innerWidth*.5-size.w*.5,18,innerWidth-size.w-18);
+        chooseFlightTarget(targetX,targetY);
+        const item=sectionTalk[key];
+        if(item)speak(item[0],item[1],4800);
+      }
+      window.addEventListener('scroll',()=>{
+        clearTimeout(sectionTimer);
+        sectionTimer=setTimeout(updateSection,420);
+      },{passive:true});
+      window.addEventListener('load',()=>{initFlight();updateSection()},{once:true});
+
       face.addEventListener('click',()=>{const item=phrases[phraseIndex++%phrases.length];speak(item[0],item[1],5600)});
       document.addEventListener('click',e=>{
         const link=e.target.closest('a');if(!link)return;
@@ -290,71 +369,6 @@
       });
       if(!reduced){setTimeout(()=>speak(phrases[0][0],'neutral',5200),900);requestAnimationFrame(frame)}
       else {ctx.clearRect(0,0,canvas.width,canvas.height);rigs.forEach(drawEye)}
-    })();
-
-    (() => {
-      const buddy = document.getElementById('mokuBuddy');
-      const face = document.getElementById('buddyFace');
-      const bubble = document.getElementById('buddyBubble');
-      const pupils = [...buddy.querySelectorAll('.buddy-pupil')];
-      const eyes = [...buddy.querySelectorAll('.buddy-eye')];
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      let hideTimer, phraseIndex = 0, lastMoodTimer;
-      const phrases = [
-        ['Привет. Я Moku. Покажу, что здесь есть.', 'neutral'],
-        ['Музыка, погода и быстрые инструменты. Всё в одном острове.', 'curious'],
-        ['Листай скриншоты. Их можно открыть на весь экран.', 'happy'],
-        ['Настройки позволяют менять форму глаз и анимации.', 'happy'],
-        ['Кнопка загрузки ведёт прямо на GitHub Releases.', 'surprised']
-      ];
-      function speak(message, mood='neutral', duration=4300) {
-        clearTimeout(hideTimer);
-        buddy.classList.remove('happy','surprised','sleepy','curious','sad','dancing');
-        if (mood !== 'neutral') buddy.classList.add(mood);
-        bubble.textContent = message;
-        buddy.classList.add('talking');
-        hideTimer = setTimeout(() => buddy.classList.remove('talking'), duration);
-        clearTimeout(lastMoodTimer);
-        lastMoodTimer = setTimeout(() => buddy.classList.remove(mood), duration + 300);
-      }
-      function blink() {
-        buddy.classList.add('blink');
-        setTimeout(() => buddy.classList.remove('blink'), 145);
-      }
-      function lookAt(x,y) {
-        const r = face.getBoundingClientRect();
-        const cx = r.left + r.width/2, cy = r.top + r.height/2;
-        const dx = Math.max(-1,Math.min(1,(x-cx)/180));
-        const dy = Math.max(-1,Math.min(1,(y-cy)/150));
-        pupils.forEach(p => p.style.transform = `translate(${dx*5}px,${dy*5}px)`);
-      }
-      document.addEventListener('pointermove', e => lookAt(e.clientX,e.clientY), {passive:true});
-      face.addEventListener('click', () => {
-        const item = phrases[phraseIndex++ % phrases.length];
-        speak(item[0],item[1],5600);
-      });
-      document.addEventListener('click', e => {
-        const link = e.target.closest('a');
-        if (!link) return;
-        if (link.href.includes('Moku-Setup')) speak('Загрузка установщика Moku. Windows 10 и 11, x64.', 'happy', 4200);
-        else if (link.hash === '#screenshots') speak('Вот как Moku выглядит в работе.', 'curious');
-        else if (link.hash === '#features') speak('Здесь собраны основные возможности приложения.', 'neutral');
-      });
-      if (!reduced) {
-        const blinkLoop = () => { blink(); setTimeout(blinkLoop, 2600 + Math.random()*3900); };
-        setTimeout(blinkLoop, 1800);
-        setTimeout(() => speak(phrases[0][0], 'neutral', 5200), 900);
-        let idle;
-        const resetIdle = () => {
-          clearTimeout(idle);
-          buddy.classList.remove('sleepy');
-          idle = setTimeout(() => { buddy.classList.add('sleepy'); speak('Кажется, тут тихо. Я пока немного подремлю.', 'sleepy', 3600); }, 38000);
-        };
-        ['pointermove','keydown','scroll','click'].forEach(ev => window.addEventListener(ev, resetIdle, {passive:true}));
-        resetIdle();
-      } else {
-        face.addEventListener('click', () => speak('Я помощник Moku. Нажми на раздел сайта, чтобы узнать о нём.', 'neutral'));
-      }
     })();
 
     (() => {
