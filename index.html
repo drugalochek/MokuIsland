@@ -118,7 +118,14 @@
     .buddy-face:focus-visible{outline:1px solid #777;outline-offset:5px;border-radius:12px}
     @media(max-width:600px){.moku-buddy{gap:7px}.buddy-face,.buddy-face canvas{width:92px;height:66px}.buddy-bubble{max-width:min(205px,58vw);font-size:11px;padding:9px 11px}}
     @media(prefers-reduced-motion:reduce){.buddy-bubble{transition:none}}
-
+    /* True black, not charcoal */
+    :root{--bg:#000!important}
+    html,body{background:#000!important}
+    body{background:#000!important}
+    .shot img{background:#000!important}
+    .lightbox{background:rgba(0,0,0,.97)!important}
+    .lightbox-panel{background:#000!important}
+    .buddy-bubble{background:rgba(0,0,0,.96)!important}
   </style>
 </head>
 <body>
