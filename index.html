@@ -292,12 +292,12 @@
       function chooseFlightTarget(x,y){
         const size=flightBounds(),right=innerWidth-size.w;
         // The mascot stays docked to the right edge; only its height changes freely.
-        flight.tx=clamp(x,right-24,right-8);
+        flight.tx=clamp(x,right-10,right+6);
         flight.ty=clamp(y,18,Math.max(18,innerHeight-size.h-18));
       }
       function initFlight(){
         const size=flightBounds();
-        flight.x=Math.max(8,innerWidth-size.w-16);
+        flight.x=Math.max(8,innerWidth-size.w-2);
         flight.y=clamp(innerHeight*.68,18,innerHeight-size.h-18);
         flight.tx=flight.x;flight.ty=flight.y;
         buddy.style.setProperty('--flight-x',flight.x+'px');
@@ -308,14 +308,14 @@
         if(reduced)return;
         if(time>=flight.next){
           const size=flightBounds();
-          chooseFlightTarget(rand(innerWidth-size.w-24,innerWidth-size.w-8),rand(24,Math.max(25,innerHeight-size.h-24)));
+          chooseFlightTarget(rand(innerWidth-size.w-10,innerWidth-size.w+6),rand(24,Math.max(25,innerHeight-size.h-24)));
           flight.next=time+rand(3.2,5.8);
         }
         // Pointer reactions stay inside the right-side lane.
         const size=flightBounds(),fx=flight.x+size.w*.72,fy=flight.y+size.h*.55;
         const pd=Math.hypot(pointerX-fx,pointerY-fy);
         if(pd<175){
-          chooseFlightTarget(innerWidth-size.w-rand(8,24),flight.y+clamp(pointerY-fy,-52,52)*.55);
+          chooseFlightTarget(innerWidth-size.w+rand(-6,10),flight.y+clamp(pointerY-fy,-52,52)*.55);
           flight.next=Math.max(flight.next,time+.9);
         }
         const k=2.1,d=2*Math.sqrt(k)*.92;
@@ -329,7 +329,7 @@
       initFlight();
       window.addEventListener('resize',()=>{
         const size=flightBounds();
-        chooseFlightTarget(innerWidth-size.w-16,clamp(flight.y,12,innerHeight-size.h-12));
+        chooseFlightTarget(innerWidth-size.w-2,clamp(flight.y,12,innerHeight-size.h-12));
       },{passive:true});
 
       const sectionTalk={
