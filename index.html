@@ -65,28 +65,15 @@
     @media(max-width:760px){.features{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:600px){header{height:76px}.nav{gap:14px;font-size:12px}.version{display:none}main{padding:78px 0 48px}.hero-shot{margin-top:48px}.section-head{display:block}.section-head p{margin-top:8px}.gallery{grid-template-columns:1fr}.features{grid-template-columns:1fr}.download-card{display:block}.download-card .btn{margin-top:18px}footer{display:block}footer span{display:block;margin-top:8px}}
   
-    /* Moku companion: живые глаза в духе Vvg */
-    .moku-buddy{position:fixed;right:28px;bottom:25px;z-index:80;display:flex;align-items:flex-end;gap:12px;pointer-events:none}
-    .buddy-bubble{max-width:245px;padding:12px 15px;border:1px solid rgba(255,255,255,.15);border-radius:15px 15px 4px 15px;background:rgba(19,19,19,.86);color:#e9e9e9;font-size:12px;line-height:1.55;box-shadow:0 12px 45px rgba(0,0,0,.42);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);opacity:0;transform:translateY(7px) scale(.97);transition:opacity .24s,transform .24s}
+    /* Moku eyes: Canvas port of Vvg's spring-driven eye rig */
+    .moku-buddy{position:fixed;right:28px;bottom:24px;z-index:80;display:flex;align-items:flex-end;gap:10px;pointer-events:none}
+    .buddy-bubble{max-width:245px;padding:11px 14px;border:1px solid rgba(255,255,255,.14);border-radius:14px 14px 4px 14px;background:rgba(17,17,17,.88);color:#e9e9e9;font-size:12px;line-height:1.55;box-shadow:0 12px 42px rgba(0,0,0,.4);backdrop-filter:blur(20px);opacity:0;transform:translateY(7px) scale(.97);transition:opacity .22s,transform .22s}
     .moku-buddy.talking .buddy-bubble{opacity:1;transform:translateY(0) scale(1)}
-    .buddy-face{width:104px;height:64px;display:flex;align-items:center;justify-content:center;gap:12px;padding:10px 13px;border:1px solid rgba(255,255,255,.19);border-radius:22px;background:linear-gradient(145deg,rgba(35,35,35,.94),rgba(10,10,10,.96));box-shadow:0 15px 45px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.09);backdrop-filter:blur(20px);pointer-events:auto;cursor:pointer;transition:transform .25s,border-color .25s}
-    .buddy-face:hover{border-color:rgba(255,255,255,.34);transform:translateY(-3px)}
-    .buddy-eye{position:relative;width:25px;height:31px;border-radius:50%;background:#f4f4f4;overflow:hidden;transform-origin:center;transition:height .18s,border-radius .18s,transform .18s}
-    .buddy-pupil{position:absolute;left:8px;top:8px;width:10px;height:14px;border-radius:50%;background:#111;transition:transform .12s}
-    .buddy-pupil:after{content:"";position:absolute;left:2px;top:2px;width:3px;height:3px;border-radius:50%;background:white}
-    .buddy-lid{position:absolute;inset:0;background:#171717;transform:translateY(-105%);transition:transform .12s}
-    .moku-buddy.blink .buddy-lid{transform:translateY(0)}
-    .moku-buddy.happy .buddy-eye{height:16px;border-radius:50% 50% 42% 42%;transform:rotate(-8deg)}
-    .moku-buddy.happy .buddy-eye:last-child{transform:rotate(8deg)}
-    .moku-buddy.surprised .buddy-eye{height:36px;width:28px}
-    .moku-buddy.sleepy .buddy-eye{height:10px;border-radius:50%}
-    .moku-buddy.curious .buddy-eye:first-child{height:35px;transform:rotate(-9deg)}
-    .moku-buddy.sad .buddy-eye{height:25px;transform:rotate(9deg)}
-    .moku-buddy.sad .buddy-eye:last-child{transform:rotate(-9deg)}
-    .moku-buddy.dancing .buddy-face{animation:buddyDance .42s ease-in-out infinite alternate}
-    @keyframes buddyDance{from{transform:rotate(-4deg) translateY(0)}to{transform:rotate(4deg) translateY(-4px)}}
-    @media(max-width:600px){.moku-buddy{right:13px;bottom:13px;gap:8px}.buddy-face{width:82px;height:54px;gap:8px;padding:8px 10px;border-radius:18px}.buddy-eye{width:21px;height:27px}.buddy-pupil{left:6px;top:7px}.buddy-bubble{max-width:min(205px,58vw);font-size:11px;padding:10px 12px}}
-    @media(prefers-reduced-motion:reduce){.moku-buddy *, .moku-buddy{animation:none!important;transition:none!important}}
+    .buddy-face{width:112px;height:76px;display:block;padding:0;border:0;background:transparent;pointer-events:auto;cursor:pointer;touch-action:manipulation}
+    .buddy-face canvas{display:block;width:112px;height:76px;overflow:visible}
+    .buddy-face:focus-visible{outline:1px solid #777;outline-offset:5px;border-radius:12px}
+    @media(max-width:600px){.moku-buddy{right:13px;bottom:13px;gap:7px}.buddy-face,.buddy-face canvas{width:92px;height:66px}.buddy-bubble{max-width:min(205px,58vw);font-size:11px;padding:9px 11px}}
+    @media(prefers-reduced-motion:reduce){.buddy-bubble{transition:none}}
 
   </style>
 </head>
@@ -170,13 +157,140 @@
   <aside class="moku-buddy" id="mokuBuddy" aria-label="Помощник Moku">
     <div class="buddy-bubble" id="buddyBubble" role="status" aria-live="polite">Привет. Я Moku. Покажу, что здесь есть.</div>
     <button class="buddy-face" id="buddyFace" type="button" aria-label="Поговорить с помощником Moku" title="Нажми, чтобы поговорить">
-      <span class="buddy-eye"><span class="buddy-pupil"></span><span class="buddy-lid"></span></span>
-      <span class="buddy-eye"><span class="buddy-pupil"></span><span class="buddy-lid"></span></span>
+      <canvas id="buddyCanvas" width="336" height="228" aria-hidden="true"></canvas>
     </button>
   </aside>
 
   <script>
     document.getElementById('year').textContent=new Date().getFullYear();
+
+    (() => {
+      const buddy=document.getElementById('mokuBuddy');
+      const face=document.getElementById('buddyFace');
+      const bubble=document.getElementById('buddyBubble');
+      const canvas=document.getElementById('buddyCanvas');
+      const ctx=canvas.getContext('2d');
+      const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const rand=(a,b)=>a+Math.random()*(b-a);
+      const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+      const smooth=v=>{v=clamp(v,0,1);return v*v*(3-2*v)};
+      class Spring{
+        constructor(v){this.v=v;this.target=v;this.vel=0}
+        step(dt,k,z){const n=Math.max(1,Math.ceil(dt*240)),h=dt/n,d=2*z*Math.sqrt(k);for(let i=0;i<n;i++){this.vel+=((this.target-this.v)*k-this.vel*d)*h;this.v+=this.vel*h}}
+      }
+      const rigs=[-1,1].map((side)=>({side,stiff:side<0?1:.9,x:new Spring(0),y:new Spring(0),rot:new Spring(0),sx:new Spring(1),sy:new Spring(1),lid:new Spring(1),blink:0,phaseAt:0,hold:0}));
+      const moods={
+        neutral:[1,1,0,0],happy:[1.24,.50,14,-1.6],excited:[1.14,1.14,0,-1.2],
+        calm:[1.08,.62,0,.9],sleepy:[1.22,.18,0,3],focused:[.90,.74,-10,.2],
+        surprised:[1.18,1.30,0,-1.8],blissful:[1.34,.30,18,-1.4],
+        curious:[1.06,1.10,0,-.6],bored:[1.12,.52,0,1.4],sad:[.92,.70,9,2.4]
+      };
+      const phrases=[
+        ['Привет. Я Moku. Покажу, что здесь есть.','neutral'],
+        ['Музыка, погода и быстрые инструменты. Всё в одном острове.','curious'],
+        ['Листай скриншоты. Их можно открыть на весь экран.','happy'],
+        ['Настройки позволяют менять форму глаз и анимации.','happy'],
+        ['Кнопка загрузки ведёт прямо на GitHub Releases.','surprised']
+      ];
+      let phraseIndex=0,mood='neutral',moodUntil=0,last=performance.now(),time=0,nextBlink=2.4;
+      let gazeX=0,gazeY=0,nextGlance=2,glanceX=0,glanceY=0,saccadeUntil=0;
+      let pointerX=innerWidth/2,pointerY=innerHeight/2,lastPointerX=NaN,lastPointerY=0,cursorSpeed=0,lastMove=0;
+      let petLevel=0,petDirX=0,petDirY=0,petX=NaN,petY=0,blush=0,idleTimer,bubbleTimer;
+      const shape=()=>moods[mood]||moods.neutral;
+      function pop(next){
+        mood=next; moodUntil=time+({blissful:2.1,surprised:1.5,excited:2.5,happy:2.1,curious:1.8,sad:2.5,bored:4,sleepy:5,calm:3,focused:2}[next]||2);
+        rigs.forEach(r=>{if(next==='surprised'){r.sy.vel+=9;r.sx.vel+=3;r.y.vel-=40}else if(next==='excited'){r.y.vel-=55;r.sy.vel+=5}else if(next==='happy'){r.sy.vel-=4;r.y.vel-=28}else if(next==='blissful'){r.sy.vel-=6;r.sx.vel+=3;r.y.vel-=20}else if(next==='curious'){r.sy.vel+=4;r.y.vel-=18}else if(next==='sad'){r.y.vel+=30;r.sy.vel-=2}else if(next==='bored')r.sy.vel-=2});
+      }
+      function speak(message,next='neutral',duration=4300){
+        clearTimeout(bubbleTimer);if(next!=='neutral')pop(next);
+        bubble.textContent=message;buddy.classList.add('talking');
+        bubbleTimer=setTimeout(()=>buddy.classList.remove('talking'),duration);
+      }
+      function blinkBoth(hold=.035){
+        rigs.forEach((r,i)=>{if(!r.blink){r.blink=1;r.phaseAt=time+(i?.014:0);r.hold=hold}});
+      }
+      function stepLid(r,dt){
+        if(r.blink===1&&time>=r.phaseAt){r.lid.target=0;r.lid.step(dt,2600,.95);if(r.lid.v<.1||time-r.phaseAt>.12){r.blink=2;r.phaseAt=time}}
+        else if(r.blink===2){r.lid.step(dt,2600,.95);if(time-r.phaseAt>=r.hold){r.blink=3;r.lid.target=1}}
+        else if(r.blink===3){r.lid.step(dt,520,.48);if(Math.abs(1-r.lid.v)<.004&&Math.abs(r.lid.vel)<.048){r.lid.v=1;r.lid.vel=0;r.blink=0}}
+        else if(Math.abs(1-r.lid.v)>.002)r.lid.step(dt,520,.48);
+      }
+      function pointerMove(e){
+        pointerX=e.clientX;pointerY=e.clientY;
+        if(Number.isFinite(lastPointerX)){
+          const dx=pointerX-lastPointerX,dy=pointerY-lastPointerY,dist=Math.hypot(dx,dy);
+          cursorSpeed+=(dist/Math.max(.008,(performance.now()-lastMove)/1000||.016)-cursorSpeed)*(1-Math.exp(-14*.016));
+          if(dist>.5)lastMove=performance.now();
+          const rect=face.getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+          const over=Math.abs(pointerX-cx)<rect.width*.75&&Math.abs(pointerY-cy)<34;
+          if(over&&cursorSpeed>220){
+            if(Math.abs(dx)>1.5){const d=Math.sign(dx);if(petDirX&&d!==petDirX){petLevel=Math.min(1.8,petLevel+.34);if(petLevel>.9){pop('blissful');rigs.forEach(r=>{r.x.vel+=d*14;r.sx.vel+=1.2})}}petDirX=d}
+            if(Math.abs(dy)>1.5){const d=Math.sign(dy);if(petDirY&&d!==petDirY){petLevel=Math.min(1.8,petLevel+.34);if(petLevel>.9)pop('blissful')}petDirY=d}
+          }
+        }
+        lastPointerX=pointerX;lastPointerY=pointerY;
+      }
+      document.addEventListener('pointermove',pointerMove,{passive:true});
+      function drawEye(r){
+        const cx=168+r.side*34+r.x.v,cy=114+r.y.v;
+        const vx=r.x.vel,vy=r.y.vel;
+        const stX=Math.min(.30,Math.abs(vx)*.0055),stY=Math.min(.30,Math.abs(vy)*.0055);
+        const lid=Math.max(.06,r.lid.v),closed=Math.max(0,1-lid);
+        const sx=clamp(r.sx.v*(1+stX-stY*.45)*(1+closed*.25),.6,1.6);
+        const sy=clamp(r.sy.v*(1+stY-stX*.45)*lid,.05,1.38);
+        const rot=(r.rot.v+clamp(vx*.05,-12,12))*Math.PI/180;
+        ctx.save();ctx.translate(cx,cy);ctx.rotate(rot);ctx.scale(sx,sy);
+        ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(0,0,9.2,15.2,0,0,Math.PI*2);ctx.fill();
+        ctx.restore();
+        return {x:cx,y:cy};
+      }
+      function frame(now){
+        const dt=Math.min(.034,Math.max(.001,(now-last)/1000));last=now;time+=dt;
+        if(mood!=='neutral'&&time>moodUntil)pop('neutral');
+        const idle=(now-lastMove)/1000;
+        const rect=face.getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+        const dx=pointerX-cx,dy=pointerY-cy,dist=Math.hypot(dx,dy);
+        if(mood==='neutral'&&idle>32)pop('sleepy');
+        else if(mood==='neutral'&&idle>15)pop('bored');
+        else if(mood==='neutral'&&dist<150)pop('curious');
+        if(mood==='neutral'&&time>=nextGlance){glanceX=([-3.8,-2.4,0,2.4,3.8][Math.floor(Math.random()*5)]);glanceY=([-2,-.8,0,1.2,2.2][Math.floor(Math.random()*5)]);nextGlance=time+rand(.7,2.3)}
+        let gx=glanceX,gy=glanceY;
+        if(mood==='sleepy'){gx=0;gy=.6}
+        else if(mood==='blissful'){gx=clamp(dx/Math.max(1,dist)*1.9,-1.9,1.9);gy=-.6}
+        else if(mood!=='bored'&&mood!=='sleepy'&&dist>1){const k=smooth(Math.min(1,dist/240));gx=dx/dist*4.2*k;gy=dy/dist*3.4*k}
+        if(Math.hypot(gx-gazeX,gy-gazeY)>2.2)saccadeUntil=time+.18;
+        gazeX=gx;gazeY=gy;
+        if(time>=nextBlink&&mood!=='surprised'&&mood!=='blissful'){blinkBoth(mood==='sleepy'?.22:.035);nextBlink=time+(mood==='sleepy'?rand(3.5,6.5):rand(2.2,6))}
+        if(mood==='bored'&&Math.random()<dt*.025)blinkBoth(.45);
+        const [baseX,baseY,tilt,lift]=shape();
+        const posK=time<saccadeUntil?480:mood==='sleepy'?40:150,posZ=time<saccadeUntil?.5:mood==='sleepy'?1:.85;
+        const shapeK=mood==='sleepy'||mood==='calm'||mood==='bored'?60:230,shapeZ=mood==='sleepy'||mood==='calm'||mood==='bored'?.95:.42;
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        const centers=[];
+        rigs.forEach(r=>{
+          const curious=mood==='curious'?(dx>=0)===(r.side>0)?1.08:.94:1;
+          r.x.target=gazeX;r.y.target=gazeY+lift+Math.sin(time*(mood==='sleepy'?.8:4.8))*.35;
+          r.sx.target=baseX;r.sy.target=baseY*curious;r.rot.target=-r.side*tilt+(mood==='curious'?(dx>=0?9:-9):0)+Math.sin(time*3.1)*(mood==='blissful'?5:0);
+          r.x.step(dt,posK*r.stiff,posZ);r.y.step(dt,posK*r.stiff,posZ);
+          r.sx.step(dt,shapeK*r.stiff,shapeZ);r.sy.step(dt,shapeK*r.stiff,shapeZ);
+          r.rot.step(dt,200*r.stiff,.5);stepLid(r,dt);centers.push(drawEye(r));
+        });
+        petLevel=Math.max(0,petLevel-dt*.6);blush+=(mood==='blissful'?.9:0-blush)*(1-Math.exp(-4*dt));
+        if(blush>.01){ctx.globalAlpha=blush*.32;ctx.fillStyle='#ff7da8';centers.forEach(p=>{ctx.beginPath();ctx.ellipse(p.x+(p.x<168?-11:11),p.y+20,10,4,0,0,Math.PI*2);ctx.fill()});ctx.globalAlpha=1}
+        if(reduced)return;
+        if(mood==='neutral'&&Math.random()<dt*.001)blinkBoth();
+        requestAnimationFrame(frame);
+      }
+      face.addEventListener('click',()=>{const item=phrases[phraseIndex++%phrases.length];speak(item[0],item[1],5600)});
+      document.addEventListener('click',e=>{
+        const link=e.target.closest('a');if(!link)return;
+        if(link.href.includes('Moku-Setup'))speak('Загрузка установщика Moku. Windows 10 и 11, x64.','happy');
+        else if(link.hash==='#screenshots')speak('Вот как Moku выглядит в работе.','curious');
+        else if(link.hash==='#features')speak('Здесь собраны основные возможности приложения.','neutral');
+      });
+      if(!reduced){setTimeout(()=>speak(phrases[0][0],'neutral',5200),900);requestAnimationFrame(frame)}
+      else {ctx.clearRect(0,0,canvas.width,canvas.height);rigs.forEach(drawEye)}
+    })();
 
     (() => {
       const buddy = document.getElementById('mokuBuddy');
