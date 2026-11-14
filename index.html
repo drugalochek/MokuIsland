@@ -290,14 +290,15 @@
         return {w:r.width||190,h:r.height||90};
       }
       function chooseFlightTarget(x,y){
-        const size=flightBounds(),pad=16;
-        flight.tx=clamp(x,pad,Math.max(pad,innerWidth-size.w-pad));
-        flight.ty=clamp(y,pad,Math.max(pad,innerHeight-size.h-pad));
+        const size=flightBounds(),right=innerWidth-size.w;
+        // The mascot stays docked to the right edge; only its height changes freely.
+        flight.tx=clamp(x,right-24,right-8);
+        flight.ty=clamp(y,18,Math.max(18,innerHeight-size.h-18));
       }
       function initFlight(){
         const size=flightBounds();
-        flight.x=Math.max(16,innerWidth-size.w-24);
-        flight.y=Math.max(16,innerHeight-size.h-28);
+        flight.x=Math.max(8,innerWidth-size.w-16);
+        flight.y=clamp(innerHeight*.68,18,innerHeight-size.h-18);
         flight.tx=flight.x;flight.ty=flight.y;
         buddy.style.setProperty('--flight-x',flight.x+'px');
         buddy.style.setProperty('--flight-y',flight.y+'px');
@@ -307,15 +308,14 @@
         if(reduced)return;
         if(time>=flight.next){
           const size=flightBounds();
-          chooseFlightTarget(rand(24,Math.max(25,innerWidth-size.w-24)),rand(24,Math.max(25,innerHeight-size.h-24)));
+          chooseFlightTarget(rand(innerWidth-size.w-24,innerWidth-size.w-8),rand(24,Math.max(25,innerHeight-size.h-24)));
           flight.next=time+rand(3.2,5.8);
         }
-        // A nearby pointer attracts the mascot gently; it never blocks page controls.
+        // Pointer reactions stay inside the right-side lane.
         const size=flightBounds(),fx=flight.x+size.w*.72,fy=flight.y+size.h*.55;
         const pd=Math.hypot(pointerX-fx,pointerY-fy);
         if(pd<175){
-          const angle=Math.atan2(pointerY-fy,pointerX-fx);
-          chooseFlightTarget(flight.x+Math.cos(angle)*rand(35,85),flight.y+Math.sin(angle)*rand(28,65));
+          chooseFlightTarget(innerWidth-size.w-rand(8,24),flight.y+clamp(pointerY-fy,-52,52)*.55);
           flight.next=Math.max(flight.next,time+.9);
         }
         const k=2.1,d=2*Math.sqrt(k)*.92;
@@ -329,7 +329,7 @@
       initFlight();
       window.addEventListener('resize',()=>{
         const size=flightBounds();
-        chooseFlightTarget(clamp(flight.x,12,innerWidth-size.w-12),clamp(flight.y,12,innerHeight-size.h-12));
+        chooseFlightTarget(innerWidth-size.w-16,clamp(flight.y,12,innerHeight-size.h-12));
       },{passive:true});
 
       const sectionTalk={
@@ -349,7 +349,7 @@
         lastSection=key;
         const rect=current.getBoundingClientRect(),size=flightBounds();
         const targetY=clamp(rect.top+Math.min(rect.height*.38,180)-size.h*.45,20,innerHeight-size.h-20);
-        const targetX=clamp(innerWidth*.5-size.w*.5,18,innerWidth-size.w-18);
+        const targetX=innerWidth-size.w-rand(8,24);
         chooseFlightTarget(targetX,targetY);
         const item=sectionTalk[key];
         if(item)speak(item[0],item[1],4800);
