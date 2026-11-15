@@ -3,538 +3,109 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#000000">
-  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/drugalochek/MokuIsland/main/Picsart_26-11-12_03-28-01-581.png">
-  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/drugalochek/MokuIsland/main/Picsart_26-11-12_03-28-01-581.png">
-  <meta name="description" content="Moku — живой Dynamic Island для Windows 10 и 11. Музыка, погода, скриншоты, буфер обмена и быстрые инструменты.">
-  <title>MokuIsland — Moku 2.12.4 для Windows</title>
-  <style>
-    :root{color-scheme:dark;--bg:#080808;--panel:rgba(255,255,255,.045);--line:rgba(255,255,255,.12);--muted:#929292;--white:#f4f4f4}
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth;scroll-padding-top:90px}
-    body{margin:0;background:radial-gradient(ellipse at 50% -25%,rgba(255,255,255,.085),transparent 48%),var(--bg);color:var(--white);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.025em}
-    a{color:inherit;text-decoration:none}
-    .wrap{width:min(1120px,calc(100% - 40px));margin:auto}
-    header{height:90px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.075)}
-    .brand{font-size:21px;font-weight:720;letter-spacing:-.065em}
-    .brand span{color:#777}
-    .nav{display:flex;gap:28px;color:#aaa;font-size:13px}
-    .nav a:hover{color:#fff}
-    .version{padding:7px 10px;border:1px solid var(--line);border-radius:999px;color:#aaa;font-size:11px}
-    main{padding:105px 0 75px;text-align:center}
-    .eyebrow{display:inline-flex;align-items:center;gap:9px;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.035);color:#aaa;font-size:11px;letter-spacing:.12em;text-transform:uppercase;backdrop-filter:blur(18px)}
-    .dot{width:6px;height:6px;border-radius:50%;background:#aaa;box-shadow:0 0 12px #aaa}
-    h1{margin:27px 0 18px;font-size:clamp(62px,11vw,112px);line-height:.94;letter-spacing:-.095em;font-weight:650}
-    .lead{max-width:590px;margin:0 auto;color:#999;font-size:clamp(15px,2vw,18px);line-height:1.75}
-    .actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:32px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 20px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.055);font-size:13px;font-weight:620;transition:.2s;backdrop-filter:blur(18px)}
-    .btn.primary{background:#f2f2f2;color:#090909;border-color:#f2f2f2}
-    .btn:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.32)}
-    .note{margin-top:14px;color:#666;font-size:11px}
-    .hero-shot{max-width:900px;margin:68px auto 0;padding:9px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.08),rgba(255,255,255,.012));box-shadow:0 35px 100px rgba(0,0,0,.48);backdrop-filter:blur(24px)}
-    .hero-shot img{display:block;width:100%;height:auto;border-radius:12px;cursor:zoom-in}
-    section{padding:55px 0 70px}
-    .section-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:22px}
-    h2{margin:0;font-size:27px;letter-spacing:-.065em}
-    .section-head p{margin:0;color:#777;font-size:12px}
-    .gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
-    .shot{overflow:hidden;border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:9px;backdrop-filter:blur(20px)}
-    .shot img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:contain;background:#0b0b0b;border-radius:10px}
-    .shot figcaption{padding:12px 7px 5px;color:#aaa;font-size:12px}
-    .shot figcaption strong{color:#eee;font-weight:600}
-    .shot{cursor:zoom-in;transition:border-color .2s,transform .2s}
-    .shot:hover{border-color:rgba(255,255,255,.28);transform:translateY(-2px)}
-    .shot img{cursor:zoom-in}
-    .lightbox{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:28px;background:rgba(3,3,3,.84);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);opacity:0;visibility:hidden;transition:opacity .22s,visibility .22s}
-    .lightbox.open{opacity:1;visibility:visible}
-    .lightbox-panel{position:relative;width:min(1100px,100%);max-height:calc(100vh - 56px);display:flex;flex-direction:column;align-items:center;gap:13px;padding:12px;border:1px solid rgba(255,255,255,.16);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.095),rgba(255,255,255,.025));box-shadow:0 30px 100px rgba(0,0,0,.7)}
-    .lightbox-image{display:block;max-width:100%;max-height:calc(100vh - 140px);width:auto;height:auto;object-fit:contain;border-radius:11px}
-    .lightbox-caption{color:#aaa;font-size:12px;text-align:center;line-height:1.5}
-    .lightbox-close{position:absolute;top:20px;right:20px;z-index:2;width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.2);border-radius:13px;background:rgba(18,18,18,.72);color:#f4f4f4;font:inherit;font-size:23px;cursor:pointer;backdrop-filter:blur(18px);transition:background .2s,transform .2s}
-    .lightbox-close:hover{background:rgba(255,255,255,.15);transform:scale(1.04)}
-    body.lightbox-open{overflow:hidden}
-    @media(max-width:600px){.lightbox{padding:12px}.lightbox-panel{max-height:calc(100vh - 24px);padding:8px;border-radius:15px}.lightbox-image{max-height:calc(100vh - 100px)}.lightbox-close{top:20px;right:20px;width:38px;height:38px}}
-    .features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-    .feature{padding:21px;border:1px solid var(--line);border-radius:15px;background:var(--panel)}
-    .feature h3{margin:0 0 9px;font-size:14px;letter-spacing:-.035em}
-    .feature p{margin:0;color:#929292;font-size:12px;line-height:1.7}
-    .download-card{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:27px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(130deg,rgba(255,255,255,.07),rgba(255,255,255,.02))}
-    .download-card h2{margin-bottom:8px}
-    .download-card p{margin:0;color:#929292;font-size:12px;line-height:1.6}
-    footer{border-top:1px solid rgba(255,255,255,.075);padding:25px 0 34px;color:#666;font-size:11px;display:flex;justify-content:space-between;gap:16px}
-    @media(max-width:760px){.features{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media(max-width:600px){header{height:76px}.nav{gap:14px;font-size:12px}.version{display:none}main{padding:78px 0 48px}.hero-shot{margin-top:48px}.section-head{display:block}.section-head p{margin-top:8px}.gallery{grid-template-columns:1fr}.features{grid-template-columns:1fr}.download-card{display:block}.download-card .btn{margin-top:18px}footer{display:block}footer span{display:block;margin-top:8px}}
-  
-    /* Cleaner editorial layout: remove decorative glass cards and badges */
-    body{background:#090909;letter-spacing:-.02em}
-    header{border-bottom:1px solid #242424}
-    .version{padding:0;border:0;border-radius:0;color:#777;font-size:12px;letter-spacing:0}
-    .nav{color:#888}
-    main{padding:112px 0 82px}
-    h1{font-size:clamp(58px,9vw,100px);font-weight:620;letter-spacing:-.085em}
-    .lead{color:#aaa;line-height:1.7}
-    .actions{margin-top:30px}
-    .btn{min-height:46px;border-radius:7px;background:transparent;border-color:#383838;backdrop-filter:none}
-    .btn.primary{background:#f0f0f0;border-color:#f0f0f0}
-    .btn:hover{transform:translateY(-1px);border-color:#777}
-    .note{color:#777;font-size:12px}
-    .hero-shot{max-width:940px;margin:64px auto 0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;backdrop-filter:none}
-    .hero-shot img{border-radius:5px}
-    section{padding:58px 0 76px;border-top:1px solid #242424}
-    .section-head{margin-bottom:28px}
-    h2{font-size:30px;font-weight:580;letter-spacing:-.06em}
-    .section-head p{color:#777;font-size:13px}
-    .gallery{gap:34px 22px}
-    .shot{padding:0;border:0;border-radius:0;background:none;backdrop-filter:none}
-    .shot:hover{border-color:transparent;transform:none}
-    .shot img{aspect-ratio:16/10;object-fit:contain;background:#111;border-radius:4px}
-    .shot figcaption{padding:13px 0 0;color:#888;font-size:13px}
-    .shot figcaption strong{color:#eee;font-weight:560}
-    .features{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 42px}
-    .feature{padding:22px 0;border:0;border-top:1px solid #292929;border-radius:0;background:none}
-    .feature h3{font-size:16px;font-weight:560;margin-bottom:8px}
-    .feature p{max-width:430px;color:#999;font-size:13px;line-height:1.7}
-    footer{border-top:1px solid #242424;color:#777;font-size:12px}
-    footer strong{color:#ddd!important;font-weight:600}
-    @media(max-width:600px){
-      main{padding:78px 0 52px}
-      h1{font-size:clamp(52px,14vw,76px)}
-      .gallery{gap:26px}
-      .features{grid-template-columns:1fr}
-      .section-head{display:block}
-      .section-head p{margin-top:8px}
-    }
-
-    /* Moku eyes: Canvas port of Vvg's spring-driven eye rig */
-    .moku-buddy{position:fixed;left:0;top:0;right:auto;bottom:auto;z-index:80;display:flex;align-items:flex-end;gap:10px;pointer-events:none;will-change:transform;transform:translate3d(var(--flight-x,0px),var(--flight-y,0px),0)}
-    .buddy-bubble{max-width:245px;padding:11px 14px;border:1px solid rgba(255,255,255,.14);border-radius:14px 14px 4px 14px;background:rgba(17,17,17,.88);color:#e9e9e9;font-size:12px;line-height:1.55;box-shadow:0 12px 42px rgba(0,0,0,.4);backdrop-filter:blur(20px);opacity:0;transform:translateY(7px) scale(.97);transition:opacity .22s,transform .22s;pointer-events:none}
-    .buddy-bubble.top-offer{pointer-events:auto}
-    .buddy-top-button{display:none;margin:9px 0 0;padding:6px 11px;border:1px solid rgba(255,255,255,.22);border-radius:8px;background:#f2f2f2;color:#111;font:600 11px/1.2 system-ui,sans-serif;cursor:pointer}
-    .buddy-bubble.top-offer .buddy-top-button{display:inline-flex;align-items:center;gap:6px}
-    .buddy-top-button:hover{background:#fff}
-    .moku-buddy.talking .buddy-bubble{opacity:1;transform:translateY(0) scale(1)}
-    .buddy-face{width:112px;height:76px;display:block;padding:0;border:0;background:transparent;pointer-events:auto;cursor:pointer;touch-action:manipulation}
-    .buddy-face canvas{display:block;width:112px;height:76px;overflow:visible}
-    .buddy-face:focus-visible{outline:1px solid #777;outline-offset:5px;border-radius:12px}
-    @media(max-width:600px){.moku-buddy{gap:7px;max-width:calc(100vw - 16px)}.buddy-face{width:min(92px,28vw);height:auto;aspect-ratio:336/228;flex:0 0 auto}.buddy-face canvas{width:100%;height:100%;overflow:hidden}.buddy-bubble{max-width:min(205px,calc(100vw - 116px));font-size:11px;padding:9px 11px}}
-    @media(prefers-reduced-motion:reduce){.buddy-bubble{transition:none}}
-    /* Pure black base with a very subtle white fade at the top */
-    :root{--bg:#000!important}
-    html{background:#000!important}
-    body{background:radial-gradient(ellipse at 50% -22%,rgba(255,255,255,.14),transparent 52%),#000!important}
-    .shot{padding:11px!important;border:1px solid #292929!important;border-radius:12px!important;background:#050505!important;transition:border-color .2s,transform .2s}
-    .shot:hover{border-color:#555!important;transform:translateY(-2px)!important}
-    .shot img{background:#000!important;border-radius:6px!important}
-    .shot figcaption{padding:13px 3px 3px!important}
-    .lightbox{background:rgba(0,0,0,.97)!important}
-    .lightbox-panel{background:#000!important}
-    .buddy-bubble{background:rgba(0,0,0,.96)!important}
-  </style>
+  <meta name="theme-color" content="#09090b">
+  <meta name="description" content="Moku — живой островок для Windows 10 и 11. Музыка, буфер обмена, приложения и быстрые инструменты в одном месте.">
+  <meta property="og:title" content="Moku — маленький остров. Большие возможности.">
+  <meta property="og:description" content="Нужное — рядом. Остальное — не отвлекает. Познакомься с живым островком для Windows.">
+  <meta property="og:image" content="https://drugalochek.github.io/MokuIsland/Picsart_26-11-12_03-28-01-581.png">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="Moku.ico" sizes="any">
+  <link rel="apple-touch-icon" href="assets/moku.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>Moku — живой островок для Windows · 2.12.4</title>
+  <script type="module" src="js/app.js"></script>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <a class="brand" href="#" aria-label="Moku">
-        <img src="https://raw.githubusercontent.com/drugalochek/MokuIsland/main/Picsart_26-11-12_03-28-01-581.png" alt="Moku" width="76" height="76" style="width:76px;height:76px;object-fit:contain;border-radius:16px">
-      </a>
-      <nav class="nav" aria-label="Навигация">
-        <a href="#screenshots">Скриншоты</a>
-        <a href="#features">Возможности</a>
-        <a href="#download">Скачать</a>
-      </nav>
-      <span class="version" id="siteVersion">Windows 10 / 11 · v2.12.4</span>
-    </header>
+  <a class="skip-link" href="#main">К содержимому</a>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></symbol>
+    <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 17V5l12-2v12M9 8l12-2"/><ellipse cx="6" cy="17" rx="3" ry="3"/><ellipse cx="18" cy="15" rx="3" ry="3"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="3"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h6m6 0h4M4 17h12m4 0h0"/><circle cx="13" cy="7" r="3"/><circle cx="17" cy="17" r="3"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h5l3 3h6a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+    <symbol id="i-crop" viewBox="0 0 24 24"><path d="M7 2v13a2 2 0 0 0 2 2h13M2 7h13a2 2 0 0 1 2 2v13M3 21 21 3"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-github" viewBox="0 0 24 24"><path d="M8 20c-5 1-5-3-7-3m14 6v-4c0-1 .1-2-.6-2.7 3.5-.4 7.1-1.7 7.1-7.6A6 6 0 0 0 20 4.5 5.6 5.6 0 0 0 19.9.4S18.6 0 15.5 2a15.5 15.5 0 0 0-8 0C4.4 0 3.1.4 3.1.4A5.6 5.6 0 0 0 3 4.5 6 6 0 0 0 1.5 8.7c0 5.9 3.6 7.2 7.1 7.6C8 17 7.9 18 8 19v4" transform="translate(1 0) scale(.92)"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-windows" viewBox="0 0 24 24"><path d="m3 5 8-1v7H3V5Zm10-1 8-1v8h-8V4ZM3 13h8v7l-8-1v-6Zm10 0h8v8l-8-1v-7Z"/></symbol>
+  </svg>
 
-    <main>
-      <h1>Less noise.<br>More focus.</h1>
-      <p class="lead">Moku — живой Dynamic Island для Windows. Музыка, погода, быстрые инструменты и нужная информация в компактном интерактивном острове.</p>
-      <div class="actions" id="download">
-        <a class="btn primary" id="downloadButton" href="https://github.com/drugalochek/Moku/releases/download/Release/Moku-Setup-2.12.4-x64.exe">Скачать Moku 2.12.4 <span aria-hidden="true" style="margin-left:10px">↓</span></a>
+  <header class="site-header wrap">
+    <a class="brand" href="#" aria-label="Moku — в начало"><img src="assets/moku.png" width="40" height="40" alt=""><span>moku<span class="brand-dot">.</span></span></a>
+    <button class="menu-toggle icon-button" id="menu-toggle" type="button" aria-label="Открыть меню" aria-controls="navigation" aria-expanded="false"><span></span><span></span></button>
+    <nav id="navigation" class="navigation" aria-label="Основная навигация"><a href="#features">Возможности</a><a href="#screenshots">Интерфейс</a><a href="#questions">Вопросы</a></nav>
+    <a class="header-download" href="#download">Скачать <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+  </header>
+
+  <main id="main">
+    <section class="hero wrap" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="status-dot"></span> Маленький спутник для Windows</p>
+        <h1 id="hero-title">Меньше шума.<br><span>Больше своего.</span></h1>
+        <p class="hero-description">Музыка, приложения и нужные мелочи — в одном живом островке. Под рукой, но не на пути.</p>
+        <div class="hero-actions"><a class="button button-primary" data-download href="https://github.com/drugalochek/Moku/releases/download/Release/Moku-Setup-2.12.4-x64.exe"><svg class="icon" aria-hidden="true"><use href="#i-down"/></svg> Скачать Moku <span data-version class="button-version">2.12.4</span></a><a class="text-link" href="#playground">Познакомиться <span aria-hidden="true">↘</span></a></div>
+        <p class="download-meta">Windows 10 / 11 <span>·</span> x64 <span>·</span> <span data-size>138 МБ</span></p>
+        <div class="hero-footnote"><span class="mini-eyes" aria-hidden="true"><i></i><i></i></span><span>Да, он тоже на тебя смотрит.</span></div>
       </div>
-      <div class="note" id="downloadNote">Установщик для Windows 10 / 11 · x64 · около 144 МБ</div>
-    </main>
 
-    <section id="screenshots">
-      <div class="section-head"><h2>Скриншоты</h2><p>Реальный интерфейс Moku</p></div>
-      <div class="gallery">
-        <figure class="shot">
-          <img src="https://raw.githubusercontent.com/drugalochek/Moku/main/Screenshots/Moku-screenshot-1.png" alt="Moku во время воспроизведения музыки" loading="lazy">
-          <figcaption><strong>Музыка</strong> · обложка, управление и живая волна</figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="https://raw.githubusercontent.com/drugalochek/Moku/main/Screenshots/Moku-screenshot-2.png" alt="Свёрнутый Moku с часами и погодой" loading="lazy">
-          <figcaption><strong>Свёрнутый вид</strong> · время, погода и живые глазки</figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="https://raw.githubusercontent.com/drugalochek/Moku/main/Screenshots/Moku-screenshot-4.png" alt="Настройки Moku по разделам" loading="lazy">
-          <figcaption><strong>Настройки</strong> · категории, поиск и настройка внешнего вида</figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="https://raw.githubusercontent.com/drugalochek/Moku/main/Screenshots/Moku-screenshot-5.png" alt="Вкладка приложений Moku" loading="lazy">
-          <figcaption><strong>Приложения</strong> · игры Steam и быстрый запуск программ</figcaption>
-        </figure>
+      <div class="playground" id="playground">
+        <div class="scene-meta"><span>ТВОЙ НОВЫЙ ОСТРОВОК</span><span class="demo-tag">Интерактивное демо</span></div>
+        <div class="desktop-scene">
+          <div class="wallpaper-orbit orbit-one" aria-hidden="true"></div><div class="wallpaper-orbit orbit-two" aria-hidden="true"></div>
+          <div class="scene-grid" aria-hidden="true"></div>
+          <div class="demo-island" id="demo-island">
+            <div class="island-top"><button class="island-face eye-host" id="island-face" type="button" aria-label="Свернуть демо островка" aria-expanded="true" aria-controls="island-body"><span class="eyes" data-eyes aria-hidden="true"><span class="eye eye-left"></span><span class="eye eye-right"></span></span></button><span class="island-clock">22:08</span><span class="island-weather"><svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg> +18°</span><span class="island-expand" aria-hidden="true">⌃</span></div>
+            <div class="island-body" id="island-body">
+              <div class="demo-tabs" role="tablist" aria-label="Разделы демо Moku"><button id="tab-home" role="tab" aria-selected="true" aria-controls="panel-home" tabindex="0" data-tab="home">Главная</button><button id="tab-clip" role="tab" aria-selected="false" aria-controls="panel-clip" tabindex="-1" data-tab="clip">Буфер</button><button id="tab-apps" role="tab" aria-selected="false" aria-controls="panel-apps" tabindex="-1" data-tab="apps">Приложения</button><button id="tab-settings" role="tab" aria-selected="false" aria-controls="panel-settings" tabindex="-1" data-tab="settings">Настройки</button></div>
+              <div class="demo-panel" id="panel-home" role="tabpanel" aria-labelledby="tab-home" tabindex="0">
+                <div class="player"><div class="album-art" aria-hidden="true"><span></span><span></span><span></span></div><div class="player-info"><strong>Твоя музыка</strong><span>Только ты и любимый трек</span></div><button class="play-button" id="demo-play" type="button" aria-label="Включить демо-анимацию волны" aria-pressed="false"><svg viewBox="0 0 24 24" class="icon play-icon" aria-hidden="true"><path d="m9 5 11 7-11 7Z"/></svg><svg viewBox="0 0 24 24" class="icon pause-icon" aria-hidden="true"><path d="M9 5v14M16 5v14"/></svg></button></div>
+                <div class="music-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                <div class="demo-divider"></div><div class="demo-section-label"><span>Запущенные приложения</span><span>3</span></div><div class="running-apps"><span><span class="app-symbol app-browser" aria-hidden="true">◉</span> Браузер</span><span><span class="app-symbol app-terminal" aria-hidden="true">›_</span> Терминал</span><span><span class="app-symbol app-calc" aria-hidden="true">▦</span> Калькулятор</span></div>
+              </div>
+              <div class="demo-panel" id="panel-clip" role="tabpanel" aria-labelledby="tab-clip" tabindex="0" hidden><div class="demo-section-label"><span>История буфера</span><span>Примеры</span></div><button class="clipboard-item" data-copy="#7C5CFF" type="button"><span><strong>Цвет для новой темы</strong><small>#7C5CFF</small></span><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg></button><button class="clipboard-item" data-copy="Меньше шума. Больше своего." type="button"><span><strong>Идея на потом</strong><small>Меньше шума. Больше своего.</small></span><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg></button><p class="demo-help">Нажми на запись, чтобы скопировать пример. Твой буфер сайт не читает.</p></div>
+              <div class="demo-panel" id="panel-apps" role="tabpanel" aria-labelledby="tab-apps" tabindex="0" hidden><div class="demo-section-label"><span id="demo-folder-title">Твои приложения</span><button id="folder-back" type="button" class="small-text-button" hidden>← Назад</button></div><div class="app-tiles" id="demo-app-tiles"><button class="app-tile" id="demo-folder" type="button"><svg class="icon folder-icon" aria-hidden="true"><use href="#i-folder"/></svg><span>Работа</span><small>2 файла</small></button><div class="app-tile"><span class="tile-symbol terminal-symbol" aria-hidden="true">›_</span><span>Терминал</span><small>Приложение</small></div><div class="app-tile"><span class="tile-symbol image-symbol" aria-hidden="true">▧</span><span>Эскиз.png</span><small>Изображение</small></div></div><div id="demo-folder-items" class="folder-items" hidden><div><span class="file-extension">EXE</span><span>Редактор кода</span></div><div><span class="file-extension">BAT</span><span>Мой скрипт</span></div></div><p class="demo-help">На сайте — пример папки. Программы запускаются только в Moku.</p></div>
+              <div class="demo-panel" id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" tabindex="0" hidden><div class="demo-section-label"><span>Сделай своим</span><svg class="icon" aria-hidden="true"><use href="#i-sliders"/></svg></div><label class="radius-label" for="demo-radius">Скругление <output for="demo-radius" id="radius-value">28</output></label><input id="demo-radius" type="range" min="12" max="40" value="28" aria-label="Скругление островка в демо"><div class="color-setting"><span>Акцент</span><div class="swatches" aria-label="Цвет акцента в демо"><button type="button" class="swatch swatch-violet" data-accent="violet" aria-label="Лавандовый" aria-pressed="true"></button><button type="button" class="swatch swatch-ice" data-accent="ice" aria-label="Ледяной" aria-pressed="false"></button><button type="button" class="swatch swatch-white" data-accent="white" aria-label="Белый" aria-pressed="false"></button></div></div><p class="demo-help">Измени цвет и скругление прямо здесь. Это не меняет настройки установленного Moku.</p></div>
+            </div>
+          </div>
+          <div class="scene-bottom"><span class="scene-desktop-label"><span class="status-dot"></span> Тише рабочего стола</span><kbd>Alt <span>+</span> Пробел</kbd></div>
+        </div>
+        <div class="demo-caption"><span id="eye-caption">Поводи курсором. Нажми на глазки.</span><span aria-hidden="true">↗</span></div>
+        <noscript><p class="no-script">Интерактивный пример работает с JavaScript. Скачать Moku и посмотреть скриншоты можно и без него.</p></noscript>
       </div>
     </section>
 
-    <section id="features">
-      <div class="section-head"><h2>Что умеет Moku</h2><p>Инструменты, которые всегда под рукой</p></div>
-      <div class="features">
-        <article class="feature"><h3>Музыка</h3><p>Название трека, обложка альбома и управление воспроизведением. Анимация острова реагирует на музыку.</p></article>
-        <article class="feature"><h3>Время и погода</h3><p>Часы, дата, погода, батарея, загрузка CPU или RAM в свёрнутом виде.</p></article>
-        <article class="feature"><h3>Скриншоты</h3><p>Захват области или всего экрана, разметка пером, стрелками, рамками и маркером.</p></article>
-        <article class="feature"><h3>Буфер обмена</h3><p>История скопированного с настройкой количества записей и быстрым доступом.</p></article>
-        <article class="feature"><h3>Приложения и Steam</h3><p>Быстрый запуск программ, файлов, папок и игр Steam из одного места.</p></article>
-        <article class="feature"><h3>Настройка под себя</h3><p>Формы глаз, цвета, размеры, анимации, положение острова и горячая клавиша.</p></article>
+    <div class="intro-strip wrap"><span>Маленький по размеру.</span><span>На твоей стороне во всём остальном.</span><a href="#features" aria-label="К возможностям"><span aria-hidden="true">↓</span></a></div>
+
+    <section class="features-section wrap section-space" id="features" aria-labelledby="features-title">
+      <div class="section-heading"><div><p class="eyebrow section-eyebrow">ВОЗМОЖНОСТИ</p><h2 id="features-title">Всё нужное.<br><span class="muted">Ничего лишнего.</span></h2></div><p>Не ещё одна панель поверх всего.<br>Твоё маленькое место для важного.</p></div>
+      <div class="feature-grid">
+        <article class="feature-card feature-music"><span class="feature-number">01 / МУЗЫКА</span><div class="feature-art music-art" aria-hidden="true"><div class="record-disc"><span></span></div><div class="record-lines"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><div class="feature-text"><h3>Трек меняется.<br>Ты не отвлекаешься.</h3><p>Обложка, управление и музыкальная волна. Любимый плеер остаётся за кадром, музыка — рядом.</p></div></article>
+        <article class="feature-card feature-clipboard"><span class="feature-number">02 / БУФЕР ОБМЕНА</span><div class="feature-art clipboard-art" aria-hidden="true"><span class="clip-fragment fragment-back">Не потерять хорошую идею</span><span class="clip-fragment fragment-front"><span class="color-dot"></span> #7C5CFF <svg class="icon"><use href="#i-copy"/></svg></span></div><div class="feature-text"><h3>Скопировал.<br>Не потерял.</h3><p>История буфера и быстрый доступ к записям. На Главной — буфер или запущенные приложения: выбираешь ты.</p></div></article>
+        <article class="feature-card feature-wide"><div><span class="feature-number">03 / ПРИЛОЖЕНИЯ</span><div class="feature-text"><h3>Своим вещам —<br>своё место.</h3><p>Приложения, файлы и игры Steam. Папки, плитки разных размеров и запуск от имени администратора — в одном островке.</p></div></div><div class="folder-art" aria-hidden="true"><div class="folder-back"></div><div class="folder-file file-one">.png</div><div class="folder-file file-two">.exe</div><div class="folder-front"><svg class="icon"><use href="#i-folder"/></svg><span>Моё</span><span class="folder-art-count">всё под рукой</span></div></div></article>
       </div>
+      <div class="small-features"><article><svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg><h3>Мелочи, которые важны</h3><p>Время, погода, заряд и системные показатели в свёрнутом виде.</p></article><article><svg class="icon" aria-hidden="true"><use href="#i-crop"/></svg><h3>Поймать момент</h3><p>Скриншоты области и экрана. Стрелки, подписи и разметка — рядом.</p></article><article><svg class="icon" aria-hidden="true"><use href="#i-sliders"/></svg><h3>На твоих условиях</h3><p>Цвета, формы глаз, скругления, положение и своя горячая клавиша.</p></article></div>
     </section>
 
-    <footer><strong style="color:#aaa">moku.island.</strong><span>© <span id="year"></span> Moku · Версия <span id="footerVersion">2.12.4</span> · Windows 10 / 11 · <a href="https://github.com/drugalochek/Moku">GitHub</a></span></footer>
-  </div>
-  <div class="lightbox" id="lightbox" aria-hidden="true">
-    <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Закрыть изображение">×</button>
-    <div class="lightbox-panel" role="dialog" aria-modal="true" aria-label="Просмотр скриншота">
-      <img class="lightbox-image" id="lightboxImage" src="" alt="">
-      <div class="lightbox-caption" id="lightboxCaption"></div>
-    </div>
-  </div>
+    <section class="screenshots-section section-space" id="screenshots" aria-labelledby="screenshots-title"><div class="wrap"><div class="section-heading"><div><p class="eyebrow section-eyebrow">ИНТЕРФЕЙС</p><h2 id="screenshots-title">Красиво снаружи.<br><span class="muted">Удобно внутри.</span></h2></div><p>Не концепт и не обещание.<br>Настоящие скриншоты приложения.</p></div><div class="screenshot-grid">
+      <figure class="screenshot"><button type="button" class="screenshot-button" data-full="assets/music.webp" aria-label="Открыть скриншот: Музыка"><img src="assets/music-small.webp" width="880" height="495" alt="Интерфейс Moku во время воспроизведения музыки" loading="lazy"><span class="zoom-label" aria-hidden="true"><svg class="icon"><use href="#i-arrow"/></svg></span></button><figcaption><strong>Музыка</strong><span>В ритме твоего дня</span></figcaption></figure>
+      <figure class="screenshot"><button type="button" class="screenshot-button" data-full="assets/compact.webp" aria-label="Открыть скриншот: Свёрнутый островок"><img src="assets/compact-small.webp" width="880" height="495" alt="Свёрнутый островок Moku на рабочем столе Windows" loading="lazy"><span class="zoom-label" aria-hidden="true"><svg class="icon"><use href="#i-arrow"/></svg></span></button><figcaption><strong>Свёрнутый вид</strong><span>Важное занимает меньше места</span></figcaption></figure>
+      <figure class="screenshot"><button type="button" class="screenshot-button" data-full="assets/apps.webp" aria-label="Открыть скриншот: Приложения"><img src="assets/apps-small.webp" width="880" height="495" alt="Приложения и игры в интерфейсе Moku" loading="lazy"><span class="zoom-label" aria-hidden="true"><svg class="icon"><use href="#i-arrow"/></svg></span></button><figcaption><strong>Приложения</strong><span>Твоя коллекция под рукой</span></figcaption></figure>
+      <figure class="screenshot"><button type="button" class="screenshot-button" data-full="assets/settings.webp" aria-label="Открыть скриншот: Настройки"><img src="assets/settings-small.webp" width="880" height="495" alt="Разделы настроек и оформление Moku" loading="lazy"><span class="zoom-label" aria-hidden="true"><svg class="icon"><use href="#i-arrow"/></svg></span></button><figcaption><strong>Настройки</strong><span>С характером. Твоим.</span></figcaption></figure>
+    </div></div></section>
 
-  <aside class="moku-buddy" id="mokuBuddy" aria-label="Помощник Moku">
-    <div class="buddy-bubble" id="buddyBubble" role="status" aria-live="polite"><span id="buddyMessage">Привет. Я Moku. Покажу, что здесь есть.</span><button class="buddy-top-button" id="buddyTopButton" type="button">Наверх ↑</button></div>
-    <button class="buddy-face" id="buddyFace" type="button" aria-label="Поговорить с помощником Moku" title="Нажми, чтобы поговорить">
-      <canvas id="buddyCanvas" width="336" height="228" aria-hidden="true"></canvas>
-    </button>
-  </aside>
+    <section class="questions wrap section-space" id="questions" aria-labelledby="questions-title"><div><p class="eyebrow section-eyebrow">БЕЗ ЛИШНИХ ВОПРОСОВ</p><h2 id="questions-title">Пара деталей<br><span class="muted">перед знакомством.</span></h2></div><div class="faq-list"><details><summary>На какой Windows работает Moku?<span aria-hidden="true">+</span></summary><p>На Windows 10 и Windows 11, архитектура x64. Актуальный установщик доступен по кнопке скачивания.</p></details><details><summary>Как открыть островок?<span aria-hidden="true">+</span></summary><p>По умолчанию — Alt + Пробел. В настройках Moku можно назначить своё сочетание или отдельную клавишу.</p></details><details><summary>Можно настроить его под себя?<span aria-hidden="true">+</span></summary><p>Да: положение, размер, цвета, скругления, внешний вид глаз и анимации. А на Главной можно оставить буфер обмена или запущенные приложения.</p></details><details><summary>Глазки на сайте тоже живые?<span aria-hidden="true">+</span></summary><p>Они следят за курсором, радуются нажатию и засыпают, если ты отвлёкся. Помощник в углу никуда сам не улетает. Его можно скрыть и вернуть кнопкой внизу сайта.</p></details></div></section>
 
-  <script>
+    <section class="download-section wrap" id="download" aria-labelledby="download-title"><div class="download-surface"><div class="download-mark" aria-hidden="true"><span class="eyes static-eyes"><span class="eye eye-left"></span><span class="eye eye-right"></span></span></div><p class="eyebrow section-eyebrow">УВИДИМСЯ НА РАБОЧЕМ СТОЛЕ</p><h2 id="download-title">Твой Windows.<br><span>Немного живее.</span></h2><p class="download-description">Маленький островок, который быстро становится своим.</p><a class="button button-primary" data-download href="https://github.com/drugalochek/Moku/releases/download/Release/Moku-Setup-2.12.4-x64.exe"><svg class="icon" aria-hidden="true"><use href="#i-down"/></svg> Скачать Moku <span data-version class="button-version">2.12.4</span></a><p class="download-meta">Windows 10 / 11 <span>·</span> x64 <span>·</span> <span data-size>138 МБ</span></p><a class="release-link" href="https://github.com/drugalochek/Moku/releases/tag/Release" target="_blank" rel="noopener noreferrer">Открыть релиз на GitHub <span aria-hidden="true">↗</span></a></div></section>
+  </main>
 
-    document.getElementById('year').textContent=new Date().getFullYear();
+  <footer class="site-footer wrap"><a class="brand footer-brand" href="#" aria-label="Moku — в начало">moku<span class="brand-dot">.</span></a><p>Маленький остров. Твой характер.</p><div class="footer-links"><button id="show-assistant" type="button" class="small-text-button" hidden>Вернуть глазки</button><a href="https://github.com/drugalochek/Moku" target="_blank" rel="noopener noreferrer">GitHub <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a><span>© <span id="year">2026</span> Moku</span></div></footer>
 
-    // Read the current stable Moku release directly from GitHub.
-    (() => {
-      const releaseApi = 'https://api.github.com/repos/drugalochek/Moku/releases/latest';
-      const versionLabel = document.getElementById('siteVersion');
-      const downloadButton = document.getElementById('downloadButton');
-      const downloadNote = document.getElementById('downloadNote');
-      const footerVersion = document.getElementById('footerVersion');
+  <aside class="assistant" id="assistant" aria-label="Помощник Moku"><div class="assistant-panel" id="assistant-panel" hidden><div class="assistant-panel-heading"><strong>Привет, я Moku<span> ☺</span></strong><button class="icon-button" id="assistant-close" aria-label="Закрыть подсказку" type="button"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div><p id="assistant-message">Посмотри на островок выше — его можно свернуть, поменять цвет и скругление. Я пока побуду рядом.</p><a href="#playground" class="assistant-action" id="assistant-action">Попробовать островок <span aria-hidden="true">↗</span></a><div class="assistant-bottom"><span id="assistant-state">Рядом</span><button type="button" id="hide-assistant">Скрыть глазки</button></div></div><button class="assistant-face eye-host" id="assistant-face" type="button" aria-label="Открыть помощника Moku" aria-expanded="false" aria-controls="assistant-panel"><span class="eyes" data-eyes aria-hidden="true"><span class="eye eye-left"></span><span class="eye eye-right"></span></span></button></aside>
 
-      async function syncLatestRelease() {
-        try {
-          const response = await fetch(releaseApi, {
-            cache: 'no-store',
-            headers: { 'Accept': 'application/vnd.github+json' }
-          });
-          if (!response.ok) throw new Error('GitHub release request failed: ' + response.status);
-          const release = await response.json();
-          if (release.draft || release.prerelease) throw new Error('Latest release is not stable');
-
-          const releaseName = release.name || release.tag_name || 'Moku';
-          const versionMatch = releaseName.match(/\d+(?:\.\d+){1,3}/) ||
-                               String(release.tag_name || '').match(/\d+(?:\.\d+){1,3}/);
-          const version = versionMatch ? versionMatch[0] : releaseName.replace(/^Moku\s*/i, '').trim();
-          const installer = (release.assets || []).find(asset =>
-            /^Moku-Setup-.*-x64\.exe$/i.test(asset.name)
-          );
-          if (!installer || !installer.browser_download_url) throw new Error('Installer asset not found');
-
-          versionLabel.textContent = 'Windows 10 / 11 · v' + version;
-          downloadButton.href = installer.browser_download_url;
-          downloadButton.innerHTML = 'Скачать ' + releaseName + ' <span aria-hidden="true" style="margin-left:10px">↓</span>';
-          footerVersion.textContent = version;
-          document.title = 'MokuIsland — ' + releaseName + ' для Windows';
-
-          const sizeMb = Math.round(installer.size / (1024 * 1024));
-          downloadNote.textContent = 'Установщик для Windows 10 / 11 · x64 · около ' + sizeMb + ' МБ';
-        } catch (error) {
-          console.warn('Не удалось обновить данные релиза Moku:', error);
-        }
-      }
-
-      syncLatestRelease();
-      setInterval(syncLatestRelease, 5 * 60 * 1000);
-      document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) syncLatestRelease();
-      });
-    })();
-
-
-    (() => {
-      const buddy=document.getElementById('mokuBuddy');
-      const face=document.getElementById('buddyFace');
-      const bubble=document.getElementById('buddyBubble');
-      const bubbleMessage=document.getElementById('buddyMessage');
-      const topButton=document.getElementById('buddyTopButton');
-      const canvas=document.getElementById('buddyCanvas');
-      const ctx=canvas.getContext('2d');
-      const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const rand=(a,b)=>a+Math.random()*(b-a);
-      const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-      const smooth=v=>{v=clamp(v,0,1);return v*v*(3-2*v)};
-      class Spring{
-        constructor(v){this.v=v;this.target=v;this.vel=0}
-        step(dt,k,z){const n=Math.max(1,Math.ceil(dt*240)),h=dt/n,d=2*z*Math.sqrt(k);for(let i=0;i<n;i++){this.vel+=((this.target-this.v)*k-this.vel*d)*h;this.v+=this.vel*h}}
-      }
-      const rigs=[-1,1].map((side)=>({side,stiff:side<0?1:.9,x:new Spring(0),y:new Spring(0),rot:new Spring(0),sx:new Spring(1),sy:new Spring(1),lid:new Spring(1),blink:0,phaseAt:0,hold:0}));
-      const moods={
-        neutral:[1,1,0,0],happy:[1.24,.50,14,-1.6],excited:[1.14,1.14,0,-1.2],
-        calm:[1.08,.62,0,.9],sleepy:[1.22,.18,0,3],focused:[.90,.74,-10,.2],
-        surprised:[1.18,1.30,0,-1.8],blissful:[1.34,.30,18,-1.4],
-        curious:[1.06,1.10,0,-.6],bored:[1.12,.52,0,1.4],sad:[.92,.70,9,2.4]
-      };
-      const phrases=[
-        ['Привет. Я Moku. Покажу, что здесь есть.','neutral'],
-        ['Музыка, погода и быстрые инструменты. Всё в одном острове.','curious'],
-        ['Листай скриншоты. Их можно открыть на весь экран.','happy'],
-        ['Настройки позволяют менять форму глаз и анимации.','happy'],
-        ['Кнопка загрузки ведёт прямо на GitHub Releases.','surprised']
-      ];
-      let phraseIndex=0,mood='neutral',moodUntil=0,last=performance.now(),time=0,nextBlink=2.4;
-      let gazeX=0,gazeY=0,nextGlance=2,glanceX=0,glanceY=0,saccadeUntil=0;
-      let pointerX=innerWidth/2,pointerY=innerHeight/2,lastPointerX=NaN,lastPointerY=0,cursorSpeed=0,lastMove=0;
-      let petLevel=0,petDirX=0,petDirY=0,petX=NaN,petY=0,blush=0,idleTimer,bubbleTimer;
-      const shape=()=>moods[mood]||moods.neutral;
-      function pop(next){
-        mood=next; moodUntil=time+({blissful:2.1,surprised:1.5,excited:2.5,happy:2.1,curious:1.8,sad:2.5,bored:4,sleepy:5,calm:3,focused:2}[next]||2);
-        rigs.forEach(r=>{if(next==='surprised'){r.sy.vel+=9;r.sx.vel+=3;r.y.vel-=40}else if(next==='excited'){r.y.vel-=55;r.sy.vel+=5}else if(next==='happy'){r.sy.vel-=4;r.y.vel-=28}else if(next==='blissful'){r.sy.vel-=6;r.sx.vel+=3;r.y.vel-=20}else if(next==='curious'){r.sy.vel+=4;r.y.vel-=18}else if(next==='sad'){r.y.vel+=30;r.sy.vel-=2}else if(next==='bored')r.sy.vel-=2});
-      }
-      function speak(message,next='neutral',duration=4300){
-        clearTimeout(bubbleTimer);if(next!=='neutral')pop(next);
-        bubbleMessage.textContent=message;buddy.classList.add('talking');
-        bubbleTimer=setTimeout(()=>buddy.classList.remove('talking'),duration);
-      }
-      function blinkBoth(hold=.035){
-        rigs.forEach((r,i)=>{if(!r.blink){r.blink=1;r.phaseAt=time+(i?.014:0);r.hold=hold}});
-      }
-      function stepLid(r,dt){
-        if(r.blink===1&&time>=r.phaseAt){r.lid.target=0;r.lid.step(dt,2600,.95);if(r.lid.v<.1||time-r.phaseAt>.12){r.blink=2;r.phaseAt=time}}
-        else if(r.blink===2){r.lid.step(dt,2600,.95);if(time-r.phaseAt>=r.hold){r.blink=3;r.lid.target=1}}
-        else if(r.blink===3){r.lid.step(dt,520,.48);if(Math.abs(1-r.lid.v)<.004&&Math.abs(r.lid.vel)<.048){r.lid.v=1;r.lid.vel=0;r.blink=0}}
-        else if(Math.abs(1-r.lid.v)>.002)r.lid.step(dt,520,.48);
-      }
-      function pointerMove(e){
-        pointerX=e.clientX;pointerY=e.clientY;
-        if(Number.isFinite(lastPointerX)){
-          const dx=pointerX-lastPointerX,dy=pointerY-lastPointerY,dist=Math.hypot(dx,dy);
-          cursorSpeed+=(dist/Math.max(.008,(performance.now()-lastMove)/1000||.016)-cursorSpeed)*(1-Math.exp(-14*.016));
-          if(dist>.5)lastMove=performance.now();
-          const rect=face.getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
-          const over=Math.abs(pointerX-cx)<rect.width*.75&&Math.abs(pointerY-cy)<34;
-          if(over&&cursorSpeed>220){
-            if(Math.abs(dx)>1.5){const d=Math.sign(dx);if(petDirX&&d!==petDirX){petLevel=Math.min(1.8,petLevel+.34);if(petLevel>.9){pop('blissful');rigs.forEach(r=>{r.x.vel+=d*14;r.sx.vel+=1.2})}}petDirX=d}
-            if(Math.abs(dy)>1.5){const d=Math.sign(dy);if(petDirY&&d!==petDirY){petLevel=Math.min(1.8,petLevel+.34);if(petLevel>.9)pop('blissful')}petDirY=d}
-          }
-        }
-        lastPointerX=pointerX;lastPointerY=pointerY;
-      }
-      document.addEventListener('pointermove',pointerMove,{passive:true});
-      function drawEye(r){
-        const cx=168+r.side*34+r.x.v,cy=114+r.y.v;
-        const vx=r.x.vel,vy=r.y.vel;
-        const stX=Math.min(.30,Math.abs(vx)*.0055),stY=Math.min(.30,Math.abs(vy)*.0055);
-        const lid=Math.max(.06,r.lid.v),closed=Math.max(0,1-lid);
-        const sx=clamp(r.sx.v*(1+stX-stY*.45)*(1+closed*.25),.6,1.6);
-        const sy=clamp(r.sy.v*(1+stY-stX*.45)*lid,.05,1.38);
-        const rot=(r.rot.v+clamp(vx*.05,-12,12))*Math.PI/180;
-        ctx.save();ctx.translate(cx,cy);ctx.rotate(rot);ctx.scale(sx,sy);
-        ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(0,0,9.2,15.2,0,0,Math.PI*2);ctx.fill();
-        ctx.restore();
-        return {x:cx,y:cy};
-      }
-      function frame(now){
-        const dt=Math.min(.034,Math.max(.001,(now-last)/1000));last=now;time+=dt;
-        if(mood!=='neutral'&&time>moodUntil)pop('neutral');
-        stepFlight(dt);
-        const idle=(now-lastMove)/1000;
-        const rect=face.getBoundingClientRect(),cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
-        const dx=pointerX-cx,dy=pointerY-cy,dist=Math.hypot(dx,dy);
-        if(mood==='neutral'&&idle>32)pop('sleepy');
-        else if(mood==='neutral'&&idle>15)pop('bored');
-        else if(mood==='neutral'&&dist<150)pop('curious');
-        if(mood==='neutral'&&time>=nextGlance){glanceX=([-3.8,-2.4,0,2.4,3.8][Math.floor(Math.random()*5)]);glanceY=([-2,-.8,0,1.2,2.2][Math.floor(Math.random()*5)]);nextGlance=time+rand(.7,2.3)}
-        let gx=glanceX,gy=glanceY;
-        if(mood==='sleepy'){gx=0;gy=.6}
-        else if(mood==='blissful'){gx=clamp(dx/Math.max(1,dist)*1.9,-1.9,1.9);gy=-.6}
-        else if(mood!=='bored'&&mood!=='sleepy'&&dist>1){const k=smooth(Math.min(1,dist/240));gx=dx/dist*4.2*k;gy=dy/dist*3.4*k}
-        if(Math.hypot(gx-gazeX,gy-gazeY)>2.2)saccadeUntil=time+.18;
-        gazeX=gx;gazeY=gy;
-        if(time>=nextBlink&&mood!=='surprised'&&mood!=='blissful'){blinkBoth(mood==='sleepy'?.22:.035);nextBlink=time+(mood==='sleepy'?rand(3.5,6.5):rand(2.2,6))}
-        if(mood==='bored'&&Math.random()<dt*.025)blinkBoth(.45);
-        const [baseX,baseY,tilt,lift]=shape();
-        const posK=time<saccadeUntil?480:mood==='sleepy'?40:150,posZ=time<saccadeUntil?.5:mood==='sleepy'?1:.85;
-        const shapeK=mood==='sleepy'||mood==='calm'||mood==='bored'?60:230,shapeZ=mood==='sleepy'||mood==='calm'||mood==='bored'?.95:.42;
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        const centers=[];
-        rigs.forEach(r=>{
-          const curious=mood==='curious'?(dx>=0)===(r.side>0)?1.08:.94:1;
-          r.x.target=gazeX;r.y.target=gazeY+lift+Math.sin(time*(mood==='sleepy'?.8:4.8))*.35;
-          r.sx.target=baseX;r.sy.target=baseY*curious;r.rot.target=-r.side*tilt+(mood==='curious'?(dx>=0?9:-9):0)+Math.sin(time*3.1)*(mood==='blissful'?5:0);
-          r.x.step(dt,posK*r.stiff,posZ);r.y.step(dt,posK*r.stiff,posZ);
-          r.sx.step(dt,shapeK*r.stiff,shapeZ);r.sy.step(dt,shapeK*r.stiff,shapeZ);
-          r.rot.step(dt,200*r.stiff,.5);stepLid(r,dt);centers.push(drawEye(r));
-        });
-        petLevel=Math.max(0,petLevel-dt*.6);blush+=((mood==='blissful'?.9:0)-blush)*(1-Math.exp(-4*dt));
-        if(blush>.01){ctx.globalAlpha=blush*.32;ctx.fillStyle='#ff7da8';centers.forEach(p=>{ctx.beginPath();ctx.ellipse(p.x+(p.x<168?-11:11),p.y+20,10,4,0,0,Math.PI*2);ctx.fill()});ctx.globalAlpha=1}
-        if(reduced)return;
-        if(mood==='neutral'&&Math.random()<dt*.001)blinkBoth();
-        requestAnimationFrame(frame);
-      }
-
-      // Whole-mascot flight: a damped spring steers the buddy around the viewport.
-      const flight={x:0,y:0,vx:0,vy:0,tx:0,ty:0,next:0};
-      function flightBounds(){
-        const r=buddy.getBoundingClientRect();
-        return {w:r.width||190,h:r.height||90};
-      }
-      function chooseFlightTarget(x,y){
-        const size=flightBounds(),right=innerWidth-size.w;
-        // The mascot stays docked to the right edge; only its height changes freely.
-        flight.tx=clamp(x,8,Math.max(8,right-12));
-        flight.ty=clamp(y,18,Math.max(18,innerHeight-size.h-18));
-      }
-      function initFlight(){
-        const size=flightBounds();
-        flight.x=clamp(innerWidth-size.w-12,8,Math.max(8,innerWidth-size.w-12));
-        flight.y=clamp(innerHeight*.68,18,innerHeight-size.h-18);
-        flight.tx=flight.x;flight.ty=flight.y;
-        buddy.style.setProperty('--flight-x',flight.x+'px');
-        buddy.style.setProperty('--flight-y',flight.y+'px');
-        flight.next=time+1.8;
-      }
-      function stepFlight(dt){
-        if(reduced)return;
-        if(time>=flight.next){
-          const size=flightBounds();
-          chooseFlightTarget(rand(innerWidth-size.w-10,innerWidth-size.w+6),rand(24,Math.max(25,innerHeight-size.h-24)));
-          flight.next=time+rand(3.2,5.8);
-        }
-        // Pointer reactions stay inside the right-side lane.
-        const size=flightBounds(),fx=flight.x+size.w*.72,fy=flight.y+size.h*.55;
-        const pd=Math.hypot(pointerX-fx,pointerY-fy);
-        if(pd<175){
-          chooseFlightTarget(innerWidth-size.w+rand(-6,10),flight.y+clamp(pointerY-fy,-52,52)*.55);
-          flight.next=Math.max(flight.next,time+.9);
-        }
-        const k=2.1,d=2*Math.sqrt(k)*.92;
-        flight.vx+=((flight.tx-flight.x)*k-flight.vx*d)*dt;
-        flight.vy+=((flight.ty-flight.y)*k-flight.vy*d)*dt;
-        flight.x+=flight.vx*dt;flight.y+=flight.vy*dt;
-        const bob=Math.sin(time*1.7)*3;
-        buddy.style.setProperty('--flight-x',flight.x+'px');
-        buddy.style.setProperty('--flight-y',(flight.y+bob)+'px');
-      }
-      initFlight();
-      window.addEventListener('resize',()=>{
-        const size=flightBounds();
-        chooseFlightTarget(innerWidth-size.w-12,clamp(flight.y,12,innerHeight-size.h-12));
-      },{passive:true});
-
-      const sectionTalk={
-        hero:['Это главная MokuIsland. Здесь коротко о приложении и ссылка на установщик.','curious'],
-        screenshots:['Это скриншоты Moku. Нажми на любой, чтобы открыть его крупнее.','happy'],
-        features:['Здесь перечислены возможности Moku: музыка, погода, скриншоты и быстрые инструменты.','curious'],
-        download:['Это загрузка Moku. Установщик рассчитан на Windows 10 и 11, x64.','happy']
-      };
-      let lastSection='',sectionTimer;
-      function updateSection(){
-        const sections=[...document.querySelectorAll('main, #screenshots, #features, #download')];
-        const marker=innerHeight*.48;
-        let current=sections[0];
-        for(const el of sections){const r=el.getBoundingClientRect();if(r.top<=marker)current=el}
-        const key=current.id||'hero';
-        if(key===lastSection)return;
-        lastSection=key;
-        const rect=current.getBoundingClientRect(),size=flightBounds();
-        const targetY=clamp(rect.top+Math.min(rect.height*.38,180)-size.h*.45,20,innerHeight-size.h-20);
-        const targetX=innerWidth-size.w-rand(8,24);
-        chooseFlightTarget(targetX,targetY);
-        const item=sectionTalk[key];
-        if(item)speak(item[0],item[1],4800);
-      }
-      let bottomOfferVisible=false;
-      function updateBottomOffer(){
-        const atBottom=window.scrollY+window.innerHeight>=document.documentElement.scrollHeight-150;
-        if(atBottom&&!bottomOfferVisible){
-          bottomOfferVisible=true;
-          clearTimeout(bubbleTimer);
-          bubbleMessage.textContent='Мы в самом низу. Хочешь наверх?';
-          bubble.classList.add('top-offer');
-          buddy.classList.add('talking');
-          pop('curious');
-        }else if(!atBottom&&bottomOfferVisible){
-          bottomOfferVisible=false;
-          bubble.classList.remove('top-offer');
-          buddy.classList.remove('talking');
-        }
-      }
-      topButton.addEventListener('click',()=>{
-        bubble.classList.remove('top-offer');
-        bottomOfferVisible=false;
-        speak('Полетели наверх!','excited',2200);
-        const size=flightBounds();
-        chooseFlightTarget(innerWidth-size.w-12,18);
-        window.scrollTo({top:0,behavior:reduced?'auto':'smooth'});
-      });
-      window.addEventListener('scroll',()=>{
-        clearTimeout(sectionTimer);
-        sectionTimer=setTimeout(()=>{updateSection();updateBottomOffer()},180);
-      },{passive:true});
-      window.addEventListener('load',()=>{initFlight();updateSection();updateBottomOffer()},{once:true});
-
-      face.addEventListener('click',()=>{const item=phrases[phraseIndex++%phrases.length];speak(item[0],item[1],5600)});
-      document.addEventListener('click',e=>{
-        const link=e.target.closest('a');if(!link)return;
-        if(link.href.includes('Moku-Setup'))speak('Загрузка установщика Moku. Windows 10 и 11, x64.','happy');
-        else if(link.hash==='#screenshots')speak('Вот как Moku выглядит в работе.','curious');
-        else if(link.hash==='#features')speak('Здесь собраны основные возможности приложения.','neutral');
-      });
-      if(!reduced){setTimeout(()=>speak(phrases[0][0],'neutral',5200),900);requestAnimationFrame(frame)}
-      else {ctx.clearRect(0,0,canvas.width,canvas.height);rigs.forEach(drawEye)}
-    })();
-
-    (() => {
-      const overlay = document.getElementById('lightbox');
-      const preview = document.getElementById('lightboxImage');
-      const caption = document.getElementById('lightboxCaption');
-      const closeButton = document.getElementById('lightboxClose');
-      const shots = document.querySelectorAll('.shot img, .hero-shot img');
-      let previousFocus = null;
-      function openImage(img) {
-        previousFocus = document.activeElement;
-        preview.src = img.currentSrc || img.src;
-        preview.alt = img.alt || 'Скриншот Moku';
-        const figure = img.closest('figure');
-        caption.textContent = figure?.querySelector('figcaption')?.textContent || img.alt || '';
-        overlay.classList.add('open');
-        overlay.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('lightbox-open');
-        closeButton.focus();
-      }
-      function closeImage() {
-        if (!overlay.classList.contains('open')) return;
-        overlay.classList.remove('open');
-        overlay.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('lightbox-open');
-        preview.src = '';
-        if (previousFocus && typeof previousFocus.focus === 'function') previousFocus.focus();
-      }
-      shots.forEach(img => {
-        img.setAttribute('tabindex', '0');
-        img.setAttribute('role', 'button');
-        img.setAttribute('aria-label', 'Открыть изображение во весь экран');
-      });
-      document.addEventListener('click', event => {
-        const img = event.target.closest('.shot img, .hero-shot img');
-        if (img) openImage(img);
-      });
-      document.addEventListener('keydown', event => {
-        if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('.shot img, .hero-shot img')) {
-          event.preventDefault();
-          openImage(event.target);
-        }
-      });
-      closeButton.addEventListener('click', closeImage);
-      overlay.addEventListener('click', event => { if (event.target === overlay) closeImage(); });
-      document.addEventListener('keydown', event => { if (event.key === 'Escape') closeImage(); });
-    })();
-  </script>
+  <dialog class="lightbox" id="lightbox" aria-labelledby="lightbox-caption"><div class="lightbox-toolbar"><p id="lightbox-caption"></p><button class="icon-button" id="lightbox-close" type="button" aria-label="Закрыть скриншот"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div><img id="lightbox-image" alt=""><p class="lightbox-hint">Esc — закрыть <span aria-hidden="true">·</span> ← → — листать</p></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 </body>
 </html>

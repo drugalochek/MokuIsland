@@ -1,0 +1,110 @@
+const { chromium } = require('playwright');
+const AxeBuilder = require('@axe-core/playwright').default;
+const http = require('http'), fs = require('fs'), path = require('path');
+const root = path.resolve(__dirname, '..');
+const results = path.join(root, 'test-results'); fs.mkdirSync(results, { recursive: true });
+const report = { checks: [], errors: [], requestsFailed: [], a11y: [], layouts: [] };
+function check(value, name) { if (!value) throw new Error(name); report.checks.push(name); }
+const types = { '.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.webp':'image/webp','.png':'image/png','.ico':'image/x-icon' };
+const server = http.createServer((req, res) => { const p = path.join(root, decodeURIComponent(req.url.split('?')[0] === '/' ? '/index.html' : req.url.split('?')[0])); if (!p.startsWith(root + '/')) { res.writeHead(403);return res.end(); } try { const b=fs.readFileSync(p);res.setHeader('Content-Type',types[path.extname(p)]||'application/octet-stream');res.end(b); } catch { res.writeHead(404);res.end('not found'); } });
+(async()=>{
+ await new Promise(r=>server.listen(4173,'127.0.0.1',r));
+ const browser = await chromium.launch({...(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {}),args:['--no-sandbox','--disable-dev-shm-usage']});
+ try {
+  const context=await browser.newContext({viewport:{width:1440,height:1000},deviceScaleFactor:1});
+  const page=await context.newPage();
+  page.on('pageerror',e=>report.errors.push(e.message));
+  page.on('requestfailed',r=>report.requestsFailed.push(r.url()+': '+r.failure().errorText));
+  await page.route('https://api.github.com/repos/drugalochek/Moku/releases/latest',route=>route.fulfill({json:{name:'Moku 2.12.4',assets:[{name:'Moku-Setup-2.12.4-x64.exe',size:144345279,browser_download_url:'https://github.com/drugalochek/Moku/releases/download/Release/Moku-Setup-2.12.4-x64.exe'}]}}));
+  await page.goto('http://127.0.0.1:4173/',{waitUntil:'networkidle'});
+  await page.screenshot({path:path.join(results, 'desktop.png'),fullPage:true});
+  check(await page.locator('[data-version]').first().textContent()==='2.12.4','stable installer sync');
+  check(await page.locator('#assistant-panel').isHidden(),'assistant does not talk uninvited');
+  const before=await page.locator('#assistant-face').boundingBox();
+  await page.mouse.move(100,200);await page.waitForTimeout(600);
+  check(await page.locator('#assistant-face [data-eyes]').getAttribute('data-mood')==='tracking','eyes respond to pointer');
+  const gaze=await page.locator('#assistant-face [data-eyes]').evaluate(el=>parseFloat(el.style.getPropertyValue('--look-x')));
+  check(gaze<0&&gaze>=-4.5,'gaze is directed and bounded');
+  await page.locator('#assistant-face').click();
+  check(await page.locator('#assistant-panel').isVisible(),'assistant opens on explicit click');
+  check(await page.locator('#assistant-face [data-eyes]').getAttribute('data-mood')==='happy','click makes eyes happy');
+  await page.locator('#assistant-close').click();
+  check(await page.locator('#assistant-panel').isHidden(),'assistant closes');
+  await page.locator('#island-face').click();check(await page.locator('#island-body').isHidden(),'island collapses');
+  await page.locator('#island-face').click();check(await page.locator('#island-body').isVisible(),'island expands');
+  await page.locator('#demo-play').click();check(await page.locator('#demo-play').getAttribute('aria-pressed')==='true','wave starts only on request');
+  check((await page.locator('#eye-caption').textContent()).includes('Звук в браузере не включается'),'demo animation honestly labeled');
+  await page.locator('#demo-play').click();check(await page.locator('#demo-play').getAttribute('aria-pressed')==='false','wave pauses');
+  await page.locator('#tab-settings').click();
+  await page.locator('#demo-radius').fill('40');await page.locator('#demo-radius').dispatchEvent('input');
+  check(await page.locator('#radius-value').textContent()==='40','corner radius readout');
+  check(await page.locator('#demo-island').evaluate(e=>e.style.getPropertyValue('--demo-radius'))==='40px','corner radius visibly applied');
+  await page.locator('[data-accent="ice"]').click();check(await page.locator('[data-accent="ice"]').getAttribute('aria-pressed')==='true','accent selection');
+  await page.locator('#tab-apps').click();await page.locator('#demo-folder').click();check(await page.locator('#demo-folder-items').isVisible(),'folder opens');
+  await page.locator('#folder-back').click();check(await page.locator('#demo-app-tiles').isVisible(),'folder returns');
+  await page.locator('#tab-home').focus();await page.keyboard.press('ArrowRight');check(await page.locator('#tab-clip').getAttribute('aria-selected')==='true','keyboard tabs follow arrow keys');
+  await page.context().grantPermissions(['clipboard-read','clipboard-write']);await page.locator('[data-copy]').first().click();
+  check(await page.evaluate(()=>navigator.clipboard.readText())==='#7C5CFF','clipboard demo copies only explicit sample');
+  await page.locator('.screenshot-button').first().click();check(await page.locator('#lightbox').evaluate(e=>e.open),'screenshot modal opens');
+  await page.keyboard.press('ArrowRight');check((await page.locator('#lightbox-caption').textContent()).includes('2 / 4'),'screenshot arrow navigation');
+  await page.keyboard.press('Escape');check(!await page.locator('#lightbox').evaluate(e=>e.open),'screenshot modal escapes');
+  check(await page.locator('.screenshot-button').first().evaluate(e=>e===document.activeElement),'modal restores keyboard focus');
+  await page.locator('#assistant-face').click();await page.locator('#hide-assistant').click();check(await page.locator('#assistant').isHidden(),'helper can be hidden');
+  await page.reload({waitUntil:'networkidle'});check(await page.locator('#assistant').isHidden(),'helper hidden preference survives reload');
+  await page.locator('#show-assistant').click();check(await page.locator('#assistant').isVisible(),'helper can be restored');
+  for(const width of [320,360,390,580,768,820,1024,1440,1920]){
+   await page.setViewportSize({width,height:900});await page.waitForTimeout(100);
+   const metrics=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,stage:document.querySelector('.desktop-scene').getBoundingClientRect().toJSON(),hero:document.querySelector('h1').getBoundingClientRect().toJSON(),sceneOverflow:document.querySelector('.demo-island').scrollWidth-document.querySelector('.demo-island').clientWidth}));
+   report.layouts.push(metrics);check(metrics.scroll<=width,'no horizontal page overflow at '+width+'px');
+   check(metrics.sceneOverflow<3,'no clipped interactive demo at '+width+'px');
+   check(metrics.hero.right<=width,'headline fits at '+width+'px');
+  }
+  await page.setViewportSize({width:390,height:844});await page.goto('http://127.0.0.1:4173/',{waitUntil:'networkidle'});
+  await page.locator('#menu-toggle').click();check(await page.locator('#navigation').isVisible(),'mobile menu opens');
+  await page.keyboard.press('Escape');check(await page.locator('#navigation').isHidden(),'mobile menu escapes');
+  await page.locator('#menu-toggle').click();await page.locator('#navigation a[href="#features"]').click();check(await page.locator('#navigation').isHidden(),'mobile navigation closes after choosing destination');
+  await page.screenshot({path:path.join(results, 'mobile.png'),fullPage:true});
+  for(const width of [390,1440]){
+   await page.setViewportSize({width,height:1000});await page.goto('http://127.0.0.1:4173/',{waitUntil:'networkidle'});
+   const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+   report.a11y.push({width,violations:result.violations.map(v=>({id:v.id,impact:v.impact,description:v.description,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary})).slice(0,12)}))});
+  }
+  for (const tab of ['clip', 'apps', 'settings']) {
+   await page.locator('#tab-'+tab).click();
+   const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+   report.a11y.push({state:tab,violations:result.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))});
+  }
+  await page.locator('#tab-home').click();
+  await page.locator('#assistant-face').click();
+  let result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+  report.a11y.push({state:'assistant-open',violations:result.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))});
+  await page.locator('#assistant-close').click();
+  await page.locator('.screenshot-button').first().click();
+  result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+  report.a11y.push({state:'screenshot-modal',violations:result.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))});
+  await page.keyboard.press('Escape');
+  check(report.a11y.every(r=>r.violations.length===0),'automated accessibility checks pass across viewports, tabs, helper and modal');
+  await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
+  await page.emulateMedia({reducedMotion:'reduce'});await page.mouse.move(10,10);await page.waitForTimeout(200);
+  check(await page.locator('[data-eyes]').first().evaluate(e=>getComputedStyle(e).transform)==='none','reduced motion disables gaze movement');
+  await page.locator('#demo-play').click();check(await page.locator('.music-wave i').first().evaluate(e=>getComputedStyle(e).animationName)==='none','reduced motion disables waveform animation');
+  const after=await page.locator('#assistant-face').boundingBox();check(before.x===after.x&&before.y===after.y,'helper stays docked instead of flying away');
+  await page.unroute('https://api.github.com/repos/drugalochek/Moku/releases/latest');
+  await page.route('https://api.github.com/repos/drugalochek/Moku/releases/latest',r=>r.fulfill({status:403,json:{message:'API rate limit'}}));
+  await page.reload({waitUntil:'networkidle'});check((await page.locator('[data-download]').first().getAttribute('href')).endsWith('Moku-Setup-2.12.4-x64.exe'),'API failure preserves working fallback installer');
+  await page.clock.install();
+  await page.goto('http://127.0.0.1:4173/',{waitUntil:'networkidle'});
+  await page.clock.fastForward(24000);
+  check(await page.locator('#assistant-face [data-eyes]').getAttribute('data-mood')==='sleepy','eyes rest after inactivity');
+  await page.mouse.move(10,10);
+  check(await page.locator('#assistant-face [data-eyes]').getAttribute('data-mood')==='tracking','pointer movement wakes resting eyes');
+  const noJS=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});
+  const plain=await noJS.newPage();
+  await plain.goto('http://127.0.0.1:4173/',{waitUntil:'networkidle'});
+  check(await plain.locator('[data-download]').first().getAttribute('href')==='https://github.com/drugalochek/Moku/releases/download/Release/Moku-Setup-2.12.4-x64.exe','download link works without JavaScript');
+  check(await plain.locator('#features-title').isVisible()&&await plain.locator('#screenshots-title').isVisible(),'content remains visible without JavaScript');
+  await noJS.close();
+  check(report.errors.length===0,'no browser JavaScript errors');
+ }finally{await browser.close();server.close();fs.writeFileSync(path.join(results, 'report.json'),JSON.stringify(report,null,2));}
+ console.log(JSON.stringify({checks:report.checks.length,errors:report.errors,a11y:report.a11y,requestsFailed:report.requestsFailed},null,2));
+})().catch(e=>{console.error(e);fs.writeFileSync(path.join(results, 'report.json'),JSON.stringify(report,null,2));server.close();process.exitCode=1;});
