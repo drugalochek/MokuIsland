@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/drugalochek/MokuIsland/main/Picsart_26-11-12_03-28-01-581.png">
   <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/drugalochek/MokuIsland/main/Picsart_26-11-12_03-28-01-581.png">
   <meta name="description" content="Moku — живой Dynamic Island для Windows 10 и 11. Музыка, погода, скриншоты, буфер обмена и быстрые инструменты.">
-  <title>MokuIsland — Dynamic Island для Windows</title>
+  <title>MokuIsland — Moku 2.12.4 для Windows</title>
   <style>
     :root{color-scheme:dark;--bg:#080808;--panel:rgba(255,255,255,.045);--line:rgba(255,255,255,.12);--muted:#929292;--white:#f4f4f4}
     *{box-sizing:border-box}
@@ -142,16 +142,16 @@
         <a href="#features">Возможности</a>
         <a href="#download">Скачать</a>
       </nav>
-      <span class="version">Windows 10 / 11 · v2.12.3</span>
+      <span class="version" id="siteVersion">Windows 10 / 11 · v2.12.4</span>
     </header>
 
     <main>
       <h1>Less noise.<br>More focus.</h1>
       <p class="lead">Moku — живой Dynamic Island для Windows. Музыка, погода, быстрые инструменты и нужная информация в компактном интерактивном острове.</p>
       <div class="actions" id="download">
-        <a class="btn primary" href="https://github.com/drugalochek/Moku/releases/download/Release/Moku-Setup-2.12.3-x64.exe">Скачать Moku 2.12.3 <span aria-hidden="true" style="margin-left:10px">↓</span></a>
+        <a class="btn primary" id="downloadButton" href="https://github.com/drugalochek/Moku/releases/download/Release/Moku-Setup-2.12.4-x64.exe">Скачать Moku 2.12.4 <span aria-hidden="true" style="margin-left:10px">↓</span></a>
       </div>
-      <div class="note">Установщик для Windows 10 / 11 · x64 · около 144 МБ</div>
+      <div class="note" id="downloadNote">Установщик для Windows 10 / 11 · x64 · около 144 МБ</div>
     </main>
 
     <section id="screenshots">
@@ -188,7 +188,7 @@
       </div>
     </section>
 
-    <footer><strong style="color:#aaa">moku.island.</strong><span>© <span id="year"></span> Moku · Версия 2.12.3 · Windows 10 / 11 · <a href="https://github.com/drugalochek/Moku">GitHub</a></span></footer>
+    <footer><strong style="color:#aaa">moku.island.</strong><span>© <span id="year"></span> Moku · Версия <span id="footerVersion">2.12.4</span> · Windows 10 / 11 · <a href="https://github.com/drugalochek/Moku">GitHub</a></span></footer>
   </div>
   <div class="lightbox" id="lightbox" aria-hidden="true">
     <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Закрыть изображение">×</button>
@@ -206,7 +206,56 @@
   </aside>
 
   <script>
+
     document.getElementById('year').textContent=new Date().getFullYear();
+
+    // Read the current stable Moku release directly from GitHub.
+    (() => {
+      const releaseApi = 'https://api.github.com/repos/drugalochek/Moku/releases/latest';
+      const versionLabel = document.getElementById('siteVersion');
+      const downloadButton = document.getElementById('downloadButton');
+      const downloadNote = document.getElementById('downloadNote');
+      const footerVersion = document.getElementById('footerVersion');
+
+      async function syncLatestRelease() {
+        try {
+          const response = await fetch(releaseApi, {
+            cache: 'no-store',
+            headers: { 'Accept': 'application/vnd.github+json' }
+          });
+          if (!response.ok) throw new Error('GitHub release request failed: ' + response.status);
+          const release = await response.json();
+          if (release.draft || release.prerelease) throw new Error('Latest release is not stable');
+
+          const releaseName = release.name || release.tag_name || 'Moku';
+          const versionMatch = releaseName.match(/\\d+(?:\\.\\d+){1,3}/) ||
+                               String(release.tag_name || '').match(/\\d+(?:\\.\\d+){1,3}/);
+          const version = versionMatch ? versionMatch[0] : releaseName.replace(/^Moku\\s*/i, '').trim();
+          const installer = (release.assets || []).find(asset =>
+            /^Moku-Setup-.*-x64\\.exe$/i.test(asset.name)
+          );
+          if (!installer || !installer.browser_download_url) throw new Error('Installer asset not found');
+
+          versionLabel.textContent = 'Windows 10 / 11 · v' + version;
+          downloadButton.href = installer.browser_download_url;
+          downloadButton.innerHTML = 'Скачать ' + releaseName + ' <span aria-hidden="true" style="margin-left:10px">↓</span>';
+          footerVersion.textContent = version;
+          document.title = 'MokuIsland — ' + releaseName + ' для Windows';
+
+          const sizeMb = Math.round(installer.size / (1024 * 1024));
+          downloadNote.textContent = 'Установщик для Windows 10 / 11 · x64 · около ' + sizeMb + ' МБ';
+        } catch (error) {
+          console.warn('Не удалось обновить данные релиза Moku:', error);
+        }
+      }
+
+      syncLatestRelease();
+      setInterval(syncLatestRelease, 5 * 60 * 1000);
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) syncLatestRelease();
+      });
+    })();
+
 
     (() => {
       const buddy=document.getElementById('mokuBuddy');
