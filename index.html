@@ -228,11 +228,11 @@
           if (release.draft || release.prerelease) throw new Error('Latest release is not stable');
 
           const releaseName = release.name || release.tag_name || 'Moku';
-          const versionMatch = releaseName.match(/\\d+(?:\\.\\d+){1,3}/) ||
-                               String(release.tag_name || '').match(/\\d+(?:\\.\\d+){1,3}/);
-          const version = versionMatch ? versionMatch[0] : releaseName.replace(/^Moku\\s*/i, '').trim();
+          const versionMatch = releaseName.match(/\d+(?:\.\d+){1,3}/) ||
+                               String(release.tag_name || '').match(/\d+(?:\.\d+){1,3}/);
+          const version = versionMatch ? versionMatch[0] : releaseName.replace(/^Moku\s*/i, '').trim();
           const installer = (release.assets || []).find(asset =>
-            /^Moku-Setup-.*-x64\\.exe$/i.test(asset.name)
+            /^Moku-Setup-.*-x64\.exe$/i.test(asset.name)
           );
           if (!installer || !installer.browser_download_url) throw new Error('Installer asset not found');
 
