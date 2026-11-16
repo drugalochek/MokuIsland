@@ -1,24 +1,25 @@
-import {createEyeState,updateEyeState,eyeMood,gazeForPoint,springStep} from './eye-state.js';
-import {bounds,keepInside,chooseDestination,flightStep,balloonOffset,easeInOut} from './flight.js';
+import {createEyeState,updateEyeState,eyeMood,gazeForPoint,springStep} from './eye-state.js?v=eyes-2';
+import {bounds,keepInside,chooseDestination,flightStep,balloonOffset,easeInOut} from './flight.js?v=eyes-2';
 
 export function initAssistant() {
   const $=s=>document.querySelector(s),root=$('#assistant'),face=$('#assistant-face'),panel=$('#assistant-panel'),eyes=face.querySelector('[data-eyes]');
   const message=$('#assistant-message'),top=$('#assistant-top'),action=$('#assistant-action'),restore=$('#show-assistant'),stateLabel=$('#assistant-state');
   const motion=matchMedia('(prefers-reduced-motion: reduce)');
+  const storageKey='moku-flying-assistant-v2-hidden',summon=$('#summon-assistant');
   const tips={
-    hello:{text:'Я местный. Маленький, зато с видом на весь экран.',label:'Посмотреть интерфейс',href:'#screenshots'},
+    hello:{text:'Я здесь, выше курсора 😌 Листай — подскажу по дороге. Внизу заберу обратно наверх.',label:'Посмотреть интерфейс',href:'#screenshots'},
     features:{text:'Всё нужное в одном островке. Рабочий стол может выдохнуть.',label:'Что умеет Moku',href:'#features'},
     screenshots:{text:'Тут без фокусов — настоящие скриншоты. Нажмёшь — покажу поближе.',label:'К скриншотам',href:'#screenshots'},
     questions:{text:'Если вопрос «а что это за глаза?» — это я. Остальные ответы рядом.',label:'Частые вопросы',href:'#questions'},
-    download:{text:'Я уже почти у тебя дома. Остался установщик.',label:'Перейти к скачиванию',href:'#download'},
+    download:{text:'Нажмёшь «Скачать» — получишь установщик, без квеста по вкладкам. Я почти дома.',label:'Перейти к скачиванию',href:'#download'},
     bottom:{text:'Мы на дне. Но это только про сайт 😌 Не хочешь наверх?',top:true}
   };
-  let eye=createEyeState(performance.now()),pointer=null,hovered=false,focus=false,raf=0,last=0,nextFlight=performance.now()+3000,nextBlink=performance.now()+4900,blinkUntil=0;
-  let position={x:innerWidth-98,y:innerHeight-92},target={...position},velocity={x:0,y:0},gaze={x:0,y:0,vx:0,vy:0};
+  let eye=createEyeState(performance.now()),pointer=null,hovered=false,focus=false,raf=0,last=0,nextFlight=performance.now()+650,nextBlink=performance.now()+4900,blinkUntil=0;
+  let position={x:innerWidth>820?innerWidth*.79:innerWidth-95,y:innerWidth>820?165:105},target={...position},velocity={x:0,y:0},gaze={x:0,y:0,vx:0,vy:0};
   let mode='hello',context='hello',closeTimer,lastTip=performance.now(),bottomSeen=false,returnTrip=null,scrollFrame=0,returnFocusAfterTrip=false;
   const seen=new Set();
   const viewport=()=>({width:innerWidth,height:innerHeight});
-  const size=()=>({width:face.offsetWidth||76,height:face.offsetHeight||52});
+  const size=()=>({width:face.offsetWidth||96,height:face.offsetHeight||64});
   const fire=event=>{eye=updateEyeState(eye,event,performance.now());};
   function placePanel(){if(panel.hidden)return;const r=panel.getBoundingClientRect(),offset=balloonOffset(position,size(),{width:r.width,height:r.height},viewport());root.style.setProperty('--balloon-x',`${offset.x}px`);root.style.setProperty('--balloon-y',`${offset.y}px`);}
   function paint(){root.style.setProperty('--flight-x',`${position.x.toFixed(2)}px`);root.style.setProperty('--flight-y',`${position.y.toFixed(2)}px`);placePanel();}
@@ -77,8 +78,14 @@ export function initAssistant() {
   document.addEventListener('keydown',e=>{fire('wake');if(e.key==='Escape'&&!panel.hidden){close(root.contains(document.activeElement));}if(['PageUp','PageDown','Home','End','ArrowUp','ArrowDown',' '].includes(e.key))cancelTrip();});
   for(const event of ['wheel','touchstart'])document.addEventListener(event,cancelTrip,{passive:true});
   document.addEventListener('click',e=>{if(!root.contains(e.target)&&!panel.hidden&&!returnTrip)close();});
-  $('#hide-assistant').addEventListener('click',()=>{cancelTrip();close();root.hidden=true;restore.hidden=false;cancelAnimationFrame(raf);raf=0;try{sessionStorage.setItem('moku-assistant-hidden','1');}catch{}restore.focus();});
-  restore.addEventListener('click',()=>{root.hidden=false;restore.hidden=true;try{sessionStorage.removeItem('moku-assistant-hidden');}catch{}position=keepInside(position,bounds(viewport(),size()));paint();requestFrame();face.focus();show(context);});
+  $('#hide-assistant').addEventListener('click',()=>{cancelTrip();close();root.hidden=true;restore.hidden=false;cancelAnimationFrame(raf);raf=0;try{sessionStorage.setItem(storageKey,'1');}catch{}restore.focus();});
+  function summonBuddy(){
+    root.hidden=false;restore.hidden=true;try{sessionStorage.removeItem(storageKey);}catch{}
+    cancelTrip();position=keepInside({x:Math.min(innerWidth-115,innerWidth*.77),y:innerWidth>820?155:105},bounds(viewport(),size()));target={...position};velocity={x:0,y:0};
+    paint();requestFrame();face.focus({preventScroll:true});show(context);
+  }
+  restore.addEventListener('click',summonBuddy);summon.addEventListener('click',summonBuddy);summon.hidden=false;
+  document.addEventListener('moku:gallery-close',()=>close());
   function onScroll(){
     scrollFrame=0;if(returnTrip||root.hidden)return;
     const max=document.documentElement.scrollHeight-innerHeight,atBottom=max>150&&scrollY>=max-110;
@@ -93,7 +100,13 @@ export function initAssistant() {
   window.addEventListener('resize',()=>{cancelTrip();position=keepInside(position,bounds(viewport(),size()));target=keepInside(target,bounds(viewport(),size()));paint();},{passive:true});
   motion.addEventListener('change',()=>{cancelTrip();target={...position};velocity={x:0,y:0};});
   document.addEventListener('visibilitychange',()=>{last=0;if(document.hidden){cancelAnimationFrame(raf);raf=0;}else{fire('wake');requestFrame();}});
-  let hidden=false;try{hidden=sessionStorage.getItem('moku-assistant-hidden')==='1';}catch{}
-  root.hidden=hidden;restore.hidden=!hidden;position=keepInside(position,bounds(viewport(),size()));paint();requestFrame();
+  let hidden=false;try{hidden=sessionStorage.getItem(storageKey)==='1';}catch{}
+  root.hidden=hidden;restore.hidden=!hidden;position=keepInside(position,bounds(viewport(),size()));paint();root.dataset.ready='true';requestFrame();
+  setTimeout(()=>{if(!root.hidden&&panel.hidden&&!focus&&!hovered&&scrollY<200)show('hello',true);},5500);
+  let intentTimer;
+  for(const el of document.querySelectorAll('[data-download],.navigation a,.screenshot-button')){
+    const hint=()=>{clearTimeout(intentTimer);intentTimer=setTimeout(()=>{if(performance.now()-lastTip<8000||!panel.hidden||returnTrip)return;const key=el.hasAttribute('data-download')?'download':el.classList.contains('screenshot-button')?'screenshots':el.getAttribute('href').slice(1);show(key,true);},550);};
+    el.addEventListener('pointerenter',hint);el.addEventListener('focus',hint);el.addEventListener('pointerleave',()=>clearTimeout(intentTimer));el.addEventListener('blur',()=>clearTimeout(intentTimer));
+  }
   return {close};
 }

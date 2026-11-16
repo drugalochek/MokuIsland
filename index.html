@@ -11,9 +11,10 @@
   <meta property="og:type" content="website">
   <link rel="icon" href="Moku.ico" sizes="any">
   <link rel="apple-touch-icon" href="assets/moku.png">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=eyes-2">
   <title>Moku — живой островок для Windows · 2.12.5</title>
-  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/app.js?v=eyes-2"></script>
+  <script type="module" src="js/assistant-entry.js?v=eyes-2"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">К содержимому</a>
@@ -37,6 +38,7 @@
     <a class="brand" href="#main" aria-label="Moku — в начало"><img src="assets/moku.png" width="40" height="40" alt=""><span>moku<span class="brand-dot">.</span></span></a>
     <button class="menu-toggle icon-button" id="menu-toggle" type="button" aria-label="Открыть меню" aria-controls="navigation" aria-expanded="false"><span></span><span></span></button>
     <nav id="navigation" class="navigation" aria-label="Основная навигация"><a href="#features">Возможности</a><a href="#screenshots">Интерфейс</a><a href="#questions">Вопросы</a></nav>
+    <button class="summon-assistant" id="summon-assistant" type="button" hidden>Позвать Moku <span aria-hidden="true">↗</span></button>
     <a class="header-download" href="#download">Скачать <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
   </header>
 
@@ -51,10 +53,6 @@
         <div class="hero-footnote"><span class="mini-eyes" aria-hidden="true"><i></i><i></i></span><span>Маленький. Но с характером.</span></div>
       </div>
 
-      <figure class="hero-visual">
-        <div class="hero-screen"><img src="assets/music.webp" width="1600" height="900" alt="Реальный интерфейс Moku на рабочем столе Windows: музыка и компактный островок" fetchpriority="high"></div>
-        <figcaption><strong>Moku на рабочем столе</strong><span>Настоящий скриншот, не макет</span></figcaption>
-      </figure>
     </section>
 
     <div class="intro-strip wrap"><span>Маленький по размеру.</span><span>На твоей стороне во всём остальном.</span><a href="#features" aria-label="К возможностям"><span aria-hidden="true">↓</span></a></div>
