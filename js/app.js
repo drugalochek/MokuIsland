@@ -1,4 +1,4 @@
-import {releaseFromGitHub, validSnapshot, releaseDate, dateLabel, compareVersions, RELEASE_API} from './release.js?v=eyes-2';
+import {releaseFromGitHub, validSnapshot, releaseDate, dateLabel, compareVersions, RELEASE_API} from './release.js?v=no-buddy-1';
 const $=(selector,parent=document)=>parent.querySelector(selector);
 const $$=(selector,parent=document)=>[...parent.querySelectorAll(selector)];
 $('#year').textContent=new Date().getFullYear();
@@ -85,4 +85,3 @@ dialog.addEventListener('keydown', event => {
 dialog.addEventListener('close', () => { document.body.classList.remove('modal-open'); image.removeAttribute('src'); returnFocus?.focus(); });
 
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&menu.getAttribute('aria-expanded')==='true')closeMenu(true);});
-dialog.addEventListener('close',()=>document.dispatchEvent(new Event('moku:gallery-close')));
