@@ -37,4 +37,5 @@ jobs:
           echo "changed=true" >> "$GITHUB_OUTPUT"
       - name: Rebuild GitHub Pages
         if: steps.commit.outputs.changed == 'true'
-        run: curl -fsS -X POST -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json" https://api.github.com/repos/${{ github.repository }}/pages/builds || echo "Pages rebuild request failed; the push itself also triggers a build."
+        run: |
+          curl -fsS -X POST -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json" https://api.github.com/repos/${{ github.repository }}/pages/builds || echo "Pages rebuild request failed; the push itself also triggers a build."
