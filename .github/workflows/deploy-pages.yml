@@ -1,37 +1,40 @@
 name: Publish website and sync Moku release
+# GitHub Pages serves this repository from main, so the sync job commits the
+# rendered index.html and release.json back to main whenever the Moku release changes.
 on:
-  push:
-    branches: [main]
   schedule:
     - cron: '*/15 * * * *'
   repository_dispatch:
     types: [moku-release]
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
   pages: write
-  id-token: write
 concurrency:
-  group: pages
+  group: release-sync
   cancel-in-progress: false
 jobs:
-  publish:
+  sync:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - run: node scripts/build-site.mjs
+      - run: node scripts/sync-release.mjs
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-      - uses: actions/deploy-pages@v4
-        id: deployment
+      - name: Commit updated release data
+        id: commit
+        run: |
+          if git diff --quiet -- index.html release.json; then echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html release.json
+          git commit -m "Sync Moku release $(node -p "require('./release.json').version")"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Rebuild GitHub Pages
+        if: steps.commit.outputs.changed == 'true'
+        run: curl -fsS -X POST -H "Authorization: Bearer ${{ github.token }}" -H "Accept: application/vnd.github+json" https://api.github.com/repos/${{ github.repository }}/pages/builds || echo "Pages rebuild request failed; the push itself also triggers a build."
