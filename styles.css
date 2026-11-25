@@ -52,3 +52,8 @@
 
 /* Navigation after removing the companion controls. */
 .site-header .header-download{display:inline-flex;margin-left:auto}.site-header .navigation{margin-right:0}
+
+/* Android companion download */
+.button-secondary{background:#ffffff0c;color:#eeedf2;border:1px solid #ffffff1c;border-top-color:#ffffff2a;box-shadow:0 1px 0 #ffffff0d inset}.button-secondary:hover{background:#ffffff16;transform:translateY(-2px)}.button-secondary .button-version{border-left-color:#ffffff2a}.download-options{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 18px}.download-option{display:flex;flex-direction:column;align-items:center}[hidden]{display:none!important}
+@media(max-width:1100px){.hero-actions{gap:12px 17px}}
+@media(max-width:580px){.download-options{flex-direction:column;align-items:center}}

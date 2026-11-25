@@ -1,4 +1,4 @@
-import {releaseFromGitHub, validSnapshot, releaseDate, dateLabel, compareVersions, RELEASE_API} from './release.js?v=no-buddy-1';
+import {releaseFromGitHub, validSnapshot, releaseDate, dateLabel, compareVersions, RELEASE_API} from './release.js?v=mobile-1';
 const $=(selector,parent=document)=>parent.querySelector(selector);
 const $$=(selector,parent=document)=>[...parent.querySelectorAll(selector)];
 $('#year').textContent=new Date().getFullYear();
@@ -13,6 +13,13 @@ function applyRelease(value,source){
   $$('[data-size]').forEach(el=>{el.textContent=`${release.size} МБ`;});
   $$('[data-download]').forEach(el=>{el.href=release.url;el.setAttribute('aria-label',`Скачать Moku ${release.version} для Windows x64`);});
   $$('[data-release-link]').forEach(el=>{el.href=release.releaseUrl;});
+  const mobile=release.mobile;
+  $$('[data-apk]').forEach(el=>{el.hidden=!mobile;});
+  if(mobile){
+    $$('[data-apk-version]').forEach(el=>{el.textContent=mobile.version;});
+    $$('[data-apk-size]').forEach(el=>{el.textContent=`${String(mobile.size).replace('.',',')} МБ`;});
+    $$('[data-apk-download]').forEach(el=>{el.href=mobile.url;el.setAttribute('aria-label',`Скачать Moku Mobile ${mobile.version} для Android`);});
+  }
   $('[data-release-name]').textContent=release.name;
   $('[data-release-summary]').textContent=release.summary;
   const date=releaseDate(release),time=$('[data-release-date]');time.hidden=!date;time.textContent=dateLabel(date);if(date)time.dateTime=date;

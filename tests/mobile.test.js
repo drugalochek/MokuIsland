@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mobileFromRelease,releaseFromGitHub,validSnapshot} from '../js/release.js';
+import {renderRelease} from '../scripts/render-release.mjs';
+const base='https://github.com/drugalochek/Moku/releases/download/Release/';
+const exe={name:'Moku-Setup-2.14.0-x64.exe',browser_download_url:base+'Moku-Setup-2.14.0-x64.exe',size:144473791};
+const apk=(v,o={})=>({name:`MokuMobile-${v}.apk`,browser_download_url:base+`MokuMobile-${v}.apk`,size:2230455,...o});
+test('APK filename owns the Android version and the highest one wins',()=>{const m=mobileFromRelease({assets:[exe,apk('1.0.0'),apk('1.2.0')]});assert.equal(m.version,'1.2.0');assert.equal(m.size,2.1);assert.ok(m.url.endsWith('MokuMobile-1.2.0.apk'));});
+test('untrusted or missing APK never becomes a download link',()=>{assert.equal(mobileFromRelease({assets:[exe]}),null);assert.equal(mobileFromRelease({assets:[apk('1.0.0',{browser_download_url:'https://evil.example/MokuMobile-1.0.0.apk'})]}),null);assert.equal(mobileFromRelease({prerelease:true,assets:[apk('1.0.0')]}),null);});
+test('snapshot keeps a valid APK and drops a mismatched one',()=>{const r=releaseFromGitHub({name:'Moku 2.14.0',tag_name:'Release',html_url:'https://github.com/drugalochek/Moku/releases/tag/Release',assets:[exe,apk('1.0.0')],body:''});assert.equal(validSnapshot(r).mobile.version,'1.0.0');assert.equal(validSnapshot({...r,mobile:{...r.mobile,url:base+'Other.apk'}}).mobile,null);});
+test('server render shows or hides the Android block',()=>{const r=releaseFromGitHub({name:'Moku',tag_name:'Release',assets:[exe,apk('1.0.0')],body:''});const html='<div data-apk hidden><a data-apk data-apk-download href="old"><span data-apk-version>x</span></a><span data-apk-size>x</span></div>';const out=renderRelease(html,r);assert.ok(!out.includes('hidden'));assert.ok(out.includes('MokuMobile-1.0.0.apk'));assert.ok(out.includes('2,1 МБ'));assert.ok(renderRelease(html,{...r,mobile:null}).includes('data-apk hidden'));});
